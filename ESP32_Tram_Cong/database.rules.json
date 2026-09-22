@@ -1,0 +1,64 @@
+{
+  "rules": {
+    "admins": {
+      ".read": true,
+      ".write": "root.child('admins').child(auth.uid).val() == true"
+    },
+    "web_users": {
+      ".read": "root.child('admins').child(auth.uid).val() == true",
+      ".write": "root.child('admins').child(auth.uid).val() == true",
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "tram_cong": {
+      ".read": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true",
+      ".write": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true"
+    },
+    "tram_phao": {
+      ".read": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true",
+      ".write": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true"
+    },
+    "control": {
+      ".read": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true",
+      ".write": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true"
+    },
+    "dieu_khien": {
+      ".read": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true",
+      ".write": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true"
+    },
+    "nang_luong": {
+      ".read": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true",
+      ".write": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true"
+    },
+    "nhat_ky": {
+      ".read": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true",
+      ".write": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true"
+    },
+    "maintenance": {
+      ".read": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true",
+      ".write": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true"
+    },
+    "maintenance_history": {
+      ".read": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true",
+      ".write": "auth != null && root.child('web_users').child(auth.uid).child('isBlocked').val() != true"
+    },
+    "album_photos": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "album_deleted": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "album_override": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "album_likes": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

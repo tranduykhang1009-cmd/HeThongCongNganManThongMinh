@@ -1,0 +1,32 @@
+# PlatformIO build directory
+.pio
+.pioenvs
+.piolibdeps
+
+# VS Code
+.vscode/
+*.vscode
+
+# Node modules & dependencies
+node_modules/
+package-lock.json
+
+# Firebase temporary cache
+.firebase/
+
+# Python cache & temporary debug scripts
+__pycache__/
+*.pyc
+fix*.py
+restore*.py
+clean.py
+*.tmp
+*.log
+header_output.txt
+extracted_tool_call.txt
+dropdown_temp.txt
+header.txt
+
+# OS generated files
+Thumbs.db
+Desktop.ini

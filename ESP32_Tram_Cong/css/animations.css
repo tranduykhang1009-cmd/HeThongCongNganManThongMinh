@@ -1,0 +1,67 @@
+/* ==========================================================================
+   Animations Stylesheet: Keyframes and Utility Animation Classes
+   ========================================================================== */
+
+/* Fade In Tab Transition */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Glowing Blink Effect for Alert Icons */
+@keyframes blinkGlow {
+    0%, 100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 6px currentColor);
+    }
+    50% {
+        opacity: 0.3;
+        filter: none;
+    }
+}
+
+.icon-blink {
+    animation: blinkGlow 1s infinite;
+}
+
+/* Pulsing Border for Emergency Audio / Alert Buttons */
+@keyframes pulse-border {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+}
+
+/* Telegram Floating Widget Animations */
+@keyframes tele-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes tele-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+/* Ease Spring Curve for Mobile Navigation Bar */
+.ease-spring {
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}

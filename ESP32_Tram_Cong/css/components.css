@@ -1,0 +1,194 @@
+/* ==========================================================================
+   Components Stylesheet: Badges, Controls, Audio Grid, Simulation, Navigation
+   ========================================================================== */
+
+/* Static Differential Alert Badge */
+.diff-alert {
+    border-color: #ef4444 !important;
+    background-color: rgba(239, 68, 68, 0.05) !important;
+}
+
+.diff-alert .lucide-alert-octagon,
+.diff-alert .lucide-arrow-up-down {
+    animation: blinkGlow 1s infinite;
+    color: #ef4444 !important;
+}
+
+/* Stale Data Card Indicator */
+.stale-card {
+    filter: grayscale(100%);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+/* Form Card Transitions */
+.form-card {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Industrial Audio Dashboard Styles */
+.audio-grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+    .audio-grid-container {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.audio-track-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.875rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    text-align: left;
+    overflow: hidden;
+}
+
+.dark .audio-track-btn {
+    background-color: rgba(30, 41, 59, 0.6);
+    border-color: #334155;
+}
+
+.audio-track-btn:hover {
+    transform: translateY(-2px);
+    border-color: #3b82f6;
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -2px rgba(59, 130, 246, 0.05);
+}
+
+.audio-track-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.audio-track-btn.btn-warn {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, rgba(254, 243, 199, 0.4) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+.dark .audio-track-btn.btn-warn {
+    border-color: rgba(245, 158, 11, 0.5);
+    background: linear-gradient(135deg, rgba(180, 83, 9, 0.2) 0%, rgba(30, 41, 59, 0.8) 100%);
+}
+
+.audio-track-btn.btn-warn:hover {
+    border-color: #d97706;
+    box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.2);
+}
+
+.audio-track-btn.btn-danger-fire {
+    border-color: #ef4444;
+    background: linear-gradient(135deg, rgba(254, 226, 226, 0.5) 0%, rgba(255, 255, 255, 1) 100%);
+    animation: pulse-border 2s infinite;
+}
+
+.dark .audio-track-btn.btn-danger-fire {
+    border-color: rgba(239, 68, 68, 0.6);
+    background: linear-gradient(135deg, rgba(153, 27, 27, 0.3) 0%, rgba(30, 41, 59, 0.9) 100%);
+}
+
+.audio-track-btn.btn-danger-fire:hover {
+    border-color: #b91c1c;
+    box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+}
+
+.audio-stop-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 1rem;
+    background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+    color: white;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4), inset 0 2px 4px 0 rgba(255, 255, 255, 0.2);
+    border-bottom: 4px solid #7f1d1d;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+}
+
+.audio-stop-btn:hover {
+    background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+    box-shadow: 0 15px 20px -3px rgba(220, 38, 38, 0.5);
+}
+
+.audio-stop-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+    box-shadow: 0 5px 10px -3px rgba(220, 38, 38, 0.4);
+}
+
+/* Industrial Toggle Switch */
+.switch-industrial input:checked + div {
+    background-color: #3b82f6;
+    border-color: #2563eb;
+}
+
+.switch-industrial input:checked + div > div {
+    transform: translateX(1.25rem);
+    background-color: #ffffff;
+}
+
+/* Mobile Bottom Navigation Bar Elements */
+.nav-btn-mobile {
+    transform-origin: center bottom;
+}
+
+.nav-btn-mobile:active i {
+    transform: scale(0.85) translateY(2px);
+}
+
+.nav-btn-mobile.active {
+    color: #2563eb !important;
+}
+
+.nav-btn-mobile.active i {
+    transform: translateY(-4px) scale(1.1);
+    filter: drop-shadow(0 4px 6px rgba(37, 99, 235, 0.4));
+}
+
+.dark .nav-btn-mobile.active {
+    color: #60a5fa !important;
+}
+
+.dark .nav-btn-mobile.active i {
+    filter: drop-shadow(0 4px 6px rgba(96, 165, 250, 0.4));
+}
+
+/* 3D Sluice Simulation Canvas Components */
+#simulation-container {
+    transform-origin: top center;
+}
+
+.sim-led {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-top-left-radius: 100px;
+    border-top-right-radius: 100px;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    background-color: #cbd5e1;
+    border: 1px solid #94a3b8;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.sim-led-base {
+    width: 0.5rem;
+    height: 0.125rem;
+    background-color: #94a3b8;
+    border-radius: 1px;
+    transition: background-color 0.3s ease;
+}

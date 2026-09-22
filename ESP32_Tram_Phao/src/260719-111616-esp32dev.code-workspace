@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "260719-111616-esp32dev",
+			"path": "../../260719-111616-esp32dev"
+		},
+		{
+			"name": "260719-220712-esp32dev",
+			"path": ".."
+		},
+		{
+			"name": "TestServo",
+			"path": "../../TestServo"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "260719-111616-esp32dev"
+	}
+}

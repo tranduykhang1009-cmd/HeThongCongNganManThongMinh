@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Album Kỷ Niệm & Hình Ảnh Dự Án | Hệ Thống Cống Ngăn Mặn</title>
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Tailwind CSS & Lucide Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts Inter -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        /* iOS Safari Momentum Scrolling & Hide Scrollbars */
+        .ios-touch-scroll {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .ios-touch-scroll::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.6);
+        }
+        .gallery-card {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .gallery-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 35px -10px rgba(168, 85, 247, 0.2);
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+        .gallery-card:hover .card-img {
+            transform: scale(1.05);
+        }
+        .card-img {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .animate-heart {
+            animation: heartBounce 0.35s ease-in-out;
+        }
+        @keyframes heartBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.35); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-slate-950 text-slate-100 relative overflow-x-hidden selection:bg-purple-600 selection:text-white">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 pointer-events-none -z-20"></div>
+    <div class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-30 pointer-events-none -z-10"></div>
+    <div class="fixed -top-40 -left-40 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed -bottom-40 -right-40 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none px-4 py-3 rounded-2xl bg-slate-900/95 border border-purple-500/40 text-white text-xs font-bold shadow-2xl flex items-center gap-2.5">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-text">Thông báo</span>
+    </div>
+
+    <!-- BULK ACTIONS FLOATING BAR (Thanh công cụ khi chọn nhiều ảnh) -->
+    <div id="bulk-action-bar" class="hidden fixed bottom-4 sm:bottom-6 left-3 right-3 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-40 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl glass-card border border-purple-500/50 shadow-2xl flex items-center justify-between sm:justify-start gap-2 sm:gap-3 backdrop-blur-xl animate-fadeIn">
+        <div class="flex items-center gap-2 pr-3 border-r border-slate-700">
+            <button type="button" onclick="toggleSelectAll()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-all cursor-pointer">
+                <span id="select-all-text">Chọn tất cả</span>
+            </button>
+            <span id="selected-count-badge" class="text-xs font-black text-purple-400">Đã chọn: 0 ảnh</span>
+        </div>
+        <button type="button" onclick="shareSelectedPhotos()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <i data-lucide="share-2" class="w-3.5 h-3.5 text-blue-400"></i>
+            <span>Chia sẻ</span>
+        </button>
+        <button type="button" id="btn-bulk-delete" onclick="deleteSelectedPhotos()" class="px-3 py-1.5 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 border border-rose-500/40 text-rose-300 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+            <span>Xóa đã chọn</span>
+        </button>
+        <button type="button" onclick="clearSelectedPhotos()" class="w-7 h-7 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all ml-1 cursor-pointer" title="Bỏ chọn">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- NAVIGATION BAR -->
+    <header class="sticky top-0 z-50 glass-card border-b border-slate-800/80 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand (Trơ ra, không nhảy về bảng điều khiển khi bấm) -->
+            <div class="flex items-center gap-3 select-none cursor-default">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
+                    <i data-lucide="camera" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="text-sm font-black tracking-wide text-white flex items-center gap-1.5">
+                        <span data-i18n="brand_title">ALBUM DỰ ÁN</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 border border-purple-400/30 text-purple-300 font-bold uppercase">STEM GALLERY</span>
+                    </div>
+                    <div class="text-[11px] text-purple-400/90 font-medium">NKN Labs • STEM Gallery</div>
+                </div>
+            </div>
+
+            <!-- Nav Links Desktop -->
+            <nav class="hidden md:flex items-center gap-1">
+                <a href="index.html" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-2">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-blue-400"></i>
+                    <span data-i18n="nav_dashboard">Bảng Điều Khiển</span>
+                </a>
+                <a href="album.html" class="px-3.5 py-2 rounded-xl text-xs font-bold text-purple-400 bg-purple-900/30 border border-purple-500/30 flex items-center gap-2">
+                    <i data-lucide="images" class="w-4 h-4 text-purple-400"></i>
+                    <span data-i18n="nav_album">Album Kỷ Niệm</span>
+                </a>
+                <a href="contact.html" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-2">
+                    <i data-lucide="mail" class="w-4 h-4 text-blue-400"></i>
+                    <span data-i18n="nav_contact">Liên Hệ & Hỗ Trợ</span>
+                </a>
+            </nav>
+
+            <!-- Actions Right -->
+            <div class="flex items-center gap-2 sm:gap-2.5">
+                <!-- Add Photo Button (Chỉ hiển thị cho ADMIN) -->
+                <button type="button" id="btn-open-upload" onclick="openUploadModal()" 
+                        class="hidden inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-purple-500/20 transition-all active:scale-95 cursor-pointer">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline" data-i18n="btn_add_photo">Thêm Ảnh Mới</span>
+                </button>
+
+                <!-- Language Toggle -->
+                <button type="button" onclick="toggleLanguage()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 transition-all shadow-sm active:scale-95 cursor-pointer">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-purple-400"></i>
+                    <span id="lang-btn-text">🇻🇳 VI</span>
+                </button>
+
+                <!-- Dynamic Auth Button -->
+                <div id="album-header-auth-container">
+                    <a href="login.html" id="btn-album-login" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all active:scale-95">
+                        <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                        <span data-i18n="btn_login">Đăng Nhập</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+            </div>
+    </header>
+
+    <!-- MOBILE SLIDE-OUT DRAWER (Chuẩn 3 gạch như index.html) -->
+    <div id="mobile-drawer-backdrop" onclick="toggleMobileDrawer(false)" class="hidden fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm transition-opacity duration-300"></div>
+
+    <aside id="mobile-drawer" class="fixed top-0 left-0 bottom-0 w-[280px] z-[80] bg-slate-900/98 border-r border-slate-800 shadow-2xl flex flex-col justify-between p-5 transform -translate-x-full transition-transform duration-300 ease-out select-none">
+        <div class="space-y-6">
+            <!-- Drawer Header -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-500/20">
+                        <i data-lucide="waves" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-black text-white uppercase tracking-wider">CỐNG THÔNG MINH</div>
+                        <div class="text-[10px] text-purple-400 font-medium">NKN Labs • STEM</div>
+                    </div>
+                </div>
+                <button type="button" onclick="toggleMobileDrawer(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-2 text-xs font-bold">
+                <a href="index.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-blue-400"></i>
+                    <span data-i18n="nav_dashboard">Bảng Điều Khiển (Giám Sát)</span>
+                </a>
+                <a href="album.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-purple-300 bg-purple-950/60 border border-purple-500/30 transition-all">
+                    <i data-lucide="images" class="w-4 h-4 text-purple-400"></i>
+                    <span data-i18n="nav_album">Album Kỷ Niệm Dự Án</span>
+                </a>
+                <a href="contact.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+                    <i data-lucide="mail" class="w-4 h-4 text-cyan-400"></i>
+                    <span data-i18n="nav_contact">Liên Hệ & Hỗ Trợ</span>
+                </a>
+                <a href="login.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+                    <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
+                    <span data-i18n="btn_login">Tài Khoản & Đăng Nhập</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Drawer Footer -->
+        <div class="border-t border-slate-800 pt-4 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] text-slate-400 font-bold">Ngôn ngữ</span>
+                <button type="button" onclick="toggleLanguage()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 cursor-pointer">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-blue-400"></i>
+                    <span class="drawer-lang-btn">🇻🇳 VI</span>
+                </button>
+            </div>
+            <p class="text-[10px] text-slate-500 text-center font-medium">© 2026 NKN Labs - Cống Thông Minh</p>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+
+        <!-- HERO HEADER -->
+        <section class="text-center space-y-4 max-w-3xl mx-auto">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-black uppercase tracking-wider shadow-sm">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span data-i18n="hero_badge">KHO LƯU TRỮ HÌNH ẢNH & KỶ NIỆM DỰ ÁN</span>
+            </div>
+            <h1 class="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-snug px-2">
+                <span data-i18n="hero_title_1">Hành Trình Nghiên Cứu &</span><br class="hidden sm:inline">
+                <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent" data-i18n="hero_title_2">Chế Tạo Cống Ngăn Mặn</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed font-medium max-w-xl mx-auto px-3 line-clamp-3 sm:line-clamp-none" data-i18n="hero_sub">
+                Ghi lại toàn bộ những khoảnh khắc chế tạo cơ khí, đo kiểm cảm biến độ mặn, thiết kế mạch vi điều khiển ESP32, lập trình hệ thống web và các kỷ niệm đáng nhớ của nhóm tác giả.
+            </p>
+        </section>
+
+        <!-- CONTROLS & FILTER BAR -->
+        <section class="space-y-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-3 rounded-2xl glass-card">
+                <!-- Category Filter Pills -->
+                <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1.5 sm:pb-0 ios-touch-scroll flex-nowrap" id="filter-pills">
+                    <button type="button" onclick="setFilter('all')" class="filter-btn active whitespace-nowrap shrink-0 px-3.5 py-2 rounded-full text-xs font-extrabold transition-all bg-purple-600 text-white shadow-md shadow-purple-500/25 cursor-pointer active:scale-95" data-filter="all" data-i18n="filter_all">
+                        Tất Cả
+                    </button>
+                    <button type="button" onclick="setFilter('hardware')" class="filter-btn whitespace-nowrap shrink-0 px-3.5 py-2 rounded-full text-xs font-extrabold transition-all bg-slate-900 border border-slate-700/80 text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer active:scale-95" data-filter="hardware" data-i18n="filter_hardware">
+                        ⚙️ Cơ Khí & Cống
+                    </button>
+                    <button type="button" onclick="setFilter('circuit')" class="filter-btn whitespace-nowrap shrink-0 px-3.5 py-2 rounded-full text-xs font-extrabold transition-all bg-slate-900 border border-slate-700/80 text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer active:scale-95" data-filter="circuit" data-i18n="filter_circuit">
+                        ⚡ Mạch & ESP32
+                    </button>
+                    <button type="button" onclick="setFilter('software')" class="filter-btn whitespace-nowrap shrink-0 px-3.5 py-2 rounded-full text-xs font-extrabold transition-all bg-slate-900 border border-slate-700/80 text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer active:scale-95" data-filter="software" data-i18n="filter_software">
+                        💻 Phần Mềm & Web
+                    </button>
+                    <button type="button" onclick="setFilter('memory')" class="filter-btn whitespace-nowrap shrink-0 px-3.5 py-2 rounded-full text-xs font-extrabold transition-all bg-slate-900 border border-slate-700/80 text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer active:scale-95" data-filter="memory" data-i18n="filter_memory">
+                        🏆 Kỷ Niệm Nhóm
+                    </button>
+                    <button type="button" onclick="setFilter('other')" class="filter-btn whitespace-nowrap shrink-0 px-3.5 py-2 rounded-full text-xs font-extrabold transition-all bg-slate-900 border border-slate-700/80 text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer active:scale-95" data-filter="other" data-i18n="filter_other">
+                        📁 Khác
+                    </button>
+                </div>
+
+                <!-- Search, Count & Selection Toolbar -->
+                <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+                    <div class="relative flex-1 sm:w-52">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Tìm kiếm ảnh..." 
+                               class="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500">
+                    </div>
+
+                    <!-- Nút Bật/Tắt chế độ chọn nhiều ảnh -->
+                    <button type="button" onclick="toggleSelectionMode()" id="btn-toggle-select" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5" title="Chọn nhiều ảnh để chia sẻ hoặc xóa">
+                        <i data-lucide="check-square" class="w-3.5 h-3.5 text-purple-400"></i>
+                        <span id="select-mode-text">Chọn ảnh</span>
+                    </button>
+
+                    <span id="photo-count-badge" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-extrabold text-purple-300 shrink-0">
+                        8 Ảnh
+                    </span>
+                    <button type="button" id="btn-reset-photos" onclick="resetDeletedPhotos()" class="hidden px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition-all" title="Khôi phục các ảnh mặc định đã xóa">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 inline-block mr-1"></i> Khôi phục
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- GALLERY GRID -->
+        <section>
+            <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Dynamic Items -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden text-center py-16 space-y-3 glass-card rounded-3xl">
+                <i data-lucide="image-off" class="w-12 h-12 text-slate-500 mx-auto"></i>
+                <h3 class="text-base font-bold text-slate-300" data-i18n="empty_title">Không tìm thấy hình ảnh nào</h3>
+                <p class="text-xs text-slate-500" data-i18n="empty_desc">Thử tìm bằng từ khóa khác hoặc chọn chuyên mục khác.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md py-8 text-center text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 space-y-3">
+            <p class="font-bold text-slate-300" data-i18n="footer_authors">
+                Tác giả: Lê Trọng Nam, Trần Duy Khang, Huỳnh Minh Ngọc | GVHD: Trần Thị Hồng Hạnh
+            </p>
+            <p class="text-[11px] text-slate-500">
+                © 2026 Hệ Thống Cống Ngăn Mặn Thông Minh. Mọi quyền được bảo lưu.
+            </p>
+            <div class="flex items-center justify-center gap-4 text-xs font-semibold text-purple-400 pt-1">
+                <a href="index.html" class="hover:underline">Bảng Điều Khiển</a>
+                <span>•</span>
+                <a href="contact.html" class="hover:underline">Liên Hệ & Hỗ Trợ</a>
+                <span>•</span>
+                <a href="login.html" class="hover:underline">Đăng Nhập</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LIGHTBOX MODAL (Bấm like và chia sẻ trực tiếp được ngay trong lightbox) -->
+    <div id="lightbox-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md animate-fadeIn" onclick="handleLightboxBackdropClick(event)">
+        <div class="relative max-w-4xl w-full bg-slate-900 border border-slate-700/80 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+            <!-- Header buttons -->
+            <div class="absolute top-4 right-4 z-20 flex items-center gap-2">
+                <!-- NÚT CHIA SẺ TRONG LIGHTBOX -->
+                <button type="button" id="btn-lightbox-share" onclick="shareCurrentPhoto()" class="px-3.5 py-1.5 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-lg">
+                    <i data-lucide="share-2" class="w-3.5 h-3.5 text-blue-400"></i>
+                    <span>Chia sẻ link</span>
+                </button>
+                <button type="button" onclick="closeLightbox()" class="w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-all cursor-pointer shadow-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Image display -->
+            <div class="relative bg-black flex items-center justify-center overflow-hidden flex-1 min-h-[300px] max-h-[62vh]">
+                <img id="lightbox-img" src="" alt="" class="max-h-[62vh] w-auto max-w-full object-contain">
+            </div>
+
+            <!-- Details footer -->
+            <div class="p-5 sm:p-6 bg-slate-900 border-t border-slate-800 space-y-3 overflow-y-auto">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <span id="lightbox-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-400/30">
+                            Cơ Khí
+                        </span>
+                        <span id="lightbox-date" class="text-xs text-slate-400 font-medium">15/01/2026</span>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <!-- NÚT THÍCH BẤM ĐƯỢC NGAY TRONG LIGHTBOX -->
+                        <button type="button" id="lightbox-like-btn" onclick="handleLikeClick(currentLightboxId, event)" 
+                                class="px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer">
+                            <i data-lucide="heart" class="w-4 h-4"></i>
+                            <span id="lightbox-like-text">Thích</span>
+                            <span id="lightbox-likes-count" class="font-black ml-0.5">0</span>
+                        </button>
+
+                        <span id="lightbox-author" class="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                            <i data-lucide="user" class="w-3.5 h-3.5 text-purple-400"></i>
+                            <span id="lightbox-author-name">THPT Nguyễn Huệ</span>
+                        </span>
+                    </div>
+                </div>
+                <h3 id="lightbox-title" class="text-base sm:text-lg font-black text-white">Tiêu đề ảnh</h3>
+                <p id="lightbox-desc" class="text-xs text-slate-300 leading-relaxed">Mô tả chi tiết của ảnh.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPLOAD PHOTO MODAL (Admin Only - Cho phép nhập tên người đăng & ngày tháng năm) -->
+    <div id="upload-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+        <div class="relative max-w-lg w-full bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
+            <button type="button" onclick="closeUploadModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-colors cursor-pointer">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                    <i data-lucide="image-plus" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-white flex items-center gap-1.5" data-i18n="upload_modal_title">
+                        <span>Thêm Ảnh Mới Vào Album</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 font-bold">Admin Only 👑</span>
+                    </h3>
+                    <p class="text-[11px] text-purple-300 font-medium" data-i18n="upload_modal_sub">Tự động nén HTML5 Canvas - Siêu nhẹ, lưu tức thì</p>
+                </div>
+            </div>
+
+            <form id="upload-form" onsubmit="handleSavePhoto(event)" class="space-y-4 text-xs">
+                <div class="space-y-1.5">
+                    <label class="font-bold text-slate-300" data-i18n="upload_choose_label">Chọn ảnh từ thiết bị</label>
+                    <input type="file" id="file-input" accept="image/*" required onchange="handleFileSelected(event)"
+                           class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 file:cursor-pointer">
+                </div>
+
+                <div id="preview-box" class="hidden p-3 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2">
+                    <div class="h-40 rounded-xl overflow-hidden bg-black flex items-center justify-center">
+                        <img id="img-preview" src="" class="max-h-full max-w-full object-contain">
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] px-1 font-semibold text-slate-400">
+                        <span id="orig-size-label">Gốc: 0 KB</span>
+                        <span class="text-purple-400 font-bold" id="comp-size-label">Đã nén: 0 KB (Tiết kiệm 0%)</span>
+                    </div>
+                </div>
+
+                <!-- Tiêu đề & Chuyên mục -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="font-bold text-slate-300" data-i18n="upload_title_label">Tiêu đề ảnh (Tiếng Việt)</label>
+                        <input type="text" id="photo-title" required placeholder="Nhập tiêu đề ảnh..." 
+                               class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-white text-base sm:text-xs focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-slate-300" data-i18n="upload_category_label">Chuyên mục</label>
+                        <select id="photo-category" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500">
+                            <option value="hardware" data-i18n="filter_hardware">⚙️ Cơ Khí & Cống</option>
+                            <option value="circuit" data-i18n="filter_circuit">⚡ Mạch & ESP32</option>
+                            <option value="software" data-i18n="filter_software">💻 Phần Mềm & Web</option>
+                            <option value="memory" data-i18n="filter_memory">🏆 Kỷ Niệm Nhóm</option>
+                            <option value="other" data-i18n="filter_other">📁 Hoạt Động Khác</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Người đăng & Ngày tháng năm -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="font-bold text-slate-300">Tác giả / Người đăng (Mặc định tài khoản hiện tại, có thể sửa)</label>
+                        <input type="text" id="photo-author" required placeholder="Trần Duy Khang, Lê Trọng Nam..." 
+                               class="w-full px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-slate-300">Ngày chụp / Sự kiện</label>
+                        <input type="date" id="photo-date" 
+                               class="w-full px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="font-bold text-slate-300">Tiêu đề tiếng Anh (Tùy chọn)</label>
+                    <input type="text" id="photo-title-en" placeholder="English title (optional)..." 
+                           class="w-full px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="font-bold text-slate-300" data-i18n="upload_desc_label">Mô tả ngắn</label>
+                    <textarea id="photo-desc" rows="2" placeholder="Ghi chú thêm về khoảnh khắc này..." 
+                              class="w-full px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500"></textarea>
+                </div>
+
+                <button type="submit" id="btn-save-photo" disabled 
+                        class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-lg shadow-purple-500/20 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span data-i18n="upload_btn_submit">Lưu Vào Album Dự Án</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT PHOTO MODAL (Chỉnh sửa ảnh đã up) -->
+    <div id="edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+        <div class="relative max-w-lg w-full bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
+            <button type="button" onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-colors cursor-pointer">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                    <i data-lucide="edit-3" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-white flex items-center gap-1.5">
+                        <span>Chỉnh Sửa Thông Tin Ảnh</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 font-bold">Admin Only 👑</span>
+                    </h3>
+                    <p class="text-[11px] text-slate-400">Cập nhật tiêu đề, tác giả, ngày tháng hoặc mô tả</p>
+                </div>
+            </div>
+
+            <form id="edit-form" onsubmit="handleUpdatePhoto(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="edit-photo-id">
+
+                <div class="space-y-1">
+                    <label class="font-bold text-slate-300">Tiêu đề ảnh (Tiếng Việt)</label>
+                    <input type="text" id="edit-photo-title" required 
+                           class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="font-bold text-slate-300">Tác giả / Người đăng</label>
+                        <input type="text" id="edit-photo-author" required 
+                               class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-slate-300">Ngày chụp / Sự kiện</label>
+                        <input type="text" id="edit-photo-date" placeholder="DD/MM/YYYY" 
+                               class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="font-bold text-slate-300">Chuyên mục</label>
+                        <select id="edit-photo-category" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500">
+                            <option value="hardware">⚙️ Cơ Khí & Cống</option>
+                            <option value="circuit">⚡ Mạch & ESP32</option>
+                            <option value="software">💻 Phần Mềm & Web</option>
+                            <option value="memory">🏆 Kỷ Niệm Nhóm</option>
+                            <option value="other">📁 Hoạt Động Khác</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-slate-300">Tiêu đề tiếng Anh (Tùy chọn)</label>
+                        <input type="text" id="edit-photo-title-en" placeholder="English title (optional)..." 
+                               class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="font-bold text-slate-300">Mô tả chi tiết</label>
+                    <textarea id="edit-photo-desc" rows="3" 
+                              class="w-full px-3.5 py-2 rounded-xl bg-slate-800/80 border border-slate-700 text-white focus:outline-none focus:border-purple-500"></textarea>
+                </div>
+
+                <button type="submit" 
+                        class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold transition-all shadow-lg shadow-purple-500/20 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    <span>Cập Nhật Thông Tin</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FIREBASE & REALTIME CLOUD SYNC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgWv3tMBnArYx1JHuasH7Yg-RARRlcRb8",
+            authDomain: "hethongcongthongminh.firebaseapp.com",
+            databaseURL: "https://hethongcongthongminh-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "hethongcongthongminh",
+            storageBucket: "hethongcongthongminh.firebasestorage.app",
+            messagingSenderId: "1056991222410",
+            appId: "1:1056991222410:web:36623d39ebbc5728e02b73"
+        };
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getDatabase(app);
+
+            // Đảm bảo client luôn có Auth hợp lệ (Anonymous nếu chưa đăng nhập) để vượt qua Rule auth != null
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    signInAnonymously(auth).catch((err) => {
+                        console.warn("Đăng nhập ẩn danh lỗi:", err);
+                    });
+                } else {
+                    if (!user.isAnonymous) {
+                        let photoURL = user.photoURL || '';
+                        try {
+                            const localAvatar = localStorage.getItem('user_avatar_' + user.uid);
+                            if (localAvatar) photoURL = localAvatar;
+                            const userSnap = await get(child(ref(db), 'web_users/' + user.uid + '/photoURL'));
+                            if (userSnap.exists() && userSnap.val()) {
+                                photoURL = userSnap.val();
+                                localStorage.setItem('user_avatar_' + user.uid, photoURL);
+                            }
+                        } catch(e) {}
+                        if (photoURL) {
+                            localStorage.setItem('scada_active_avatar', photoURL);
+                            window.activeUserPhotoURL = photoURL;
+                        }
+                        if (user.displayName) {
+                            window.activeUserDisplayName = user.displayName;
+                        }
+                    }
+                    migrateLocalPhotosToCloud();
+                    if (typeof window.syncAlbumPermissions === 'function') {
+                        window.syncAlbumPermissions();
+                    }
+                }
+            });
+
+            function migrateLocalPhotosToCloud() {
+                try {
+                    const localCustom = JSON.parse(localStorage.getItem('scada_custom_album_photos') || '[]');
+                    if (localCustom.length > 0) {
+                        localCustom.forEach(p => {
+                            if (p && p.id) {
+                                set(ref(db, 'album_photos/' + p.id), p).catch(console.warn);
+                            }
+                        });
+                    }
+                    const localDel = JSON.parse(localStorage.getItem('scada_deleted_photo_ids') || '[]');
+                    if (localDel.length > 0) {
+                        localDel.forEach(id => {
+                            set(ref(db, 'album_deleted/' + id), true).catch(console.warn);
+                        });
+                    }
+                } catch(e) {}
+            }
+
+            // 1. Lắng nghe Likes từ Firebase
+            const likesRef = ref(db, 'album_likes');
+            onValue(likesRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const fbLikes = snapshot.val() || {};
+                    window.likesData = { ...window.likesData, ...fbLikes };
+                    try { localStorage.setItem('scada_photo_likes', JSON.stringify(window.likesData)); } catch(e) {}
+                }
+                window.updateAllLikeButtonsUI();
+            });
+
+            // 2. Lắng nghe Ảnh được tải lên từ Firebase (Đồng bộ mọi thiết bị & trình duyệt)
+            const photosRef = ref(db, 'album_photos');
+            onValue(photosRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const fbPhotosObj = snapshot.val() || {};
+                    const fbPhotosArr = Object.values(fbPhotosObj);
+                    fbPhotosArr.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    window.cloudCustomPhotos = fbPhotosArr;
+                    try { localStorage.setItem('scada_custom_album_photos', JSON.stringify(fbPhotosArr)); } catch(e) {}
+                } else {
+                    window.cloudCustomPhotos = [];
+                }
+                if (typeof window.syncAndRenderGallery === 'function') window.syncAndRenderGallery();
+            });
+
+            // 3. Lắng nghe Danh sách Ảnh đã xóa từ Firebase
+            const deletedRef = ref(db, 'album_deleted');
+            onValue(deletedRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    window.cloudDeletedIds = Object.keys(snapshot.val() || {});
+                    try { localStorage.setItem('scada_deleted_photo_ids', JSON.stringify(window.cloudDeletedIds)); } catch(e) {}
+                } else {
+                    window.cloudDeletedIds = [];
+                }
+                if (typeof window.syncAndRenderGallery === 'function') window.syncAndRenderGallery();
+            });
+
+            // 4. Lắng nghe Thông tin đã chỉnh sửa từ Firebase
+            const overrideRef = ref(db, 'album_override');
+            onValue(overrideRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    window.cloudOverrides = snapshot.val() || {};
+                    try { localStorage.setItem('scada_override_photos', JSON.stringify(window.cloudOverrides)); } catch(e) {}
+                } else {
+                    window.cloudOverrides = {};
+                }
+                if (typeof window.syncAndRenderGallery === 'function') window.syncAndRenderGallery();
+            });
+
+            // Các hàm lưu trữ lên Cloud Firebase
+            window.syncLikeToFirebase = function(photoId, newCount) {
+                try { set(ref(db, 'album_likes/' + photoId), newCount).catch(console.warn); } catch(e) {}
+            };
+
+            window.savePhotoToFirebase = function(photo) {
+                try { set(ref(db, 'album_photos/' + photo.id), photo).catch(console.error); } catch(e) {}
+            };
+
+            window.deletePhotoFromFirebase = function(photoId) {
+                try {
+                    set(ref(db, 'album_photos/' + photoId), null).catch(console.warn);
+                    set(ref(db, 'album_deleted/' + photoId), true).catch(console.warn);
+                } catch(e) {}
+            };
+
+            window.resetDeletedFromFirebase = function() {
+                try { set(ref(db, 'album_deleted'), null).catch(console.warn); } catch(e) {}
+            };
+
+            window.saveOverrideToFirebase = function(photoId, overrideObj) {
+                try { set(ref(db, 'album_override/' + photoId), overrideObj).catch(console.warn); } catch(e) {}
+            };
+
+        } catch(err) {
+            console.warn("Khởi tạo Firebase Database lỗi:", err);
+        }
+    </script>
+
+    <!-- MAIN APP SCRIPT -->
+    <script>
+        lucide.createIcons();
+
+        // 1. DEFAULT PHOTOS
+        const DEFAULT_PHOTOS = [
+            {
+                id: 'def-1',
+                title: 'Mô Hình Cửa Van Cống Ngăn Mặn Thẳng Đứng',
+                title_en: 'Vertical Sluice Gate Mechanism',
+                category: 'hardware',
+                badge: '⚙️ Cơ Khí',
+                badge_en: '⚙️ Hardware',
+                desc: 'Thiết kế khung cửa van cống bằng mica chịu lực cao, tích hợp ray dẫn hướng và thanh răng truyền động từ động cơ servo chống kẹt rác.',
+                desc_en: 'Vertical gate acrylic design with guide rails and rack-and-pinion transmission driven by high-torque servo.',
+                date: '10/01/2026',
+                author: 'Lê Trọng Nam',
+                gradient: 'from-blue-900 via-slate-900 to-cyan-950',
+                icon: 'sliders-vertical',
+                isDefault: true
+            },
+            {
+                id: 'def-2',
+                title: 'Khối Mạch Điều Khiển Vi Điều Khiển ESP32-WROOM',
+                title_en: 'ESP32-WROOM Central Control Board',
+                category: 'circuit',
+                badge: '⚡ Mạch Điện',
+                badge_en: '⚡ Circuit',
+                desc: 'Bo mạch trung tâm xử lý đa nhân (Dual Core) FreeRTOS, kết nối WiFi truyền dữ liệu lên Firebase và mạch cách ly quang Optocoupler kích Relay 30A.',
+                desc_en: 'ESP32 Dual Core board with FreeRTOS multitasking, WiFi telemetry to Firebase RTDB and Optocoupler-isolated 30A relay module.',
+                date: '15/01/2026',
+                author: 'Huỳnh Minh Ngọc',
+                gradient: 'from-emerald-950 via-slate-900 to-teal-950',
+                icon: 'cpu',
+                isDefault: true
+            },
+            {
+                id: 'def-3',
+                title: 'Cụm Cảm Biến Độ Mặn TDS & Siêu Âm Đo Mực Nước',
+                title_en: 'TDS Salinity & Ultrasonic Water Level Sensors',
+                category: 'circuit',
+                badge: '⚡ Cảm Biến',
+                badge_en: '⚡ Sensors',
+                desc: 'Đầu dò cảm biến TDS đo nồng độ ion muối trong nước ngọt/nước mặn kết hợp cảm biến siêu âm JSN chống nước giám sát đỉnh triều dâng.',
+                desc_en: 'TDS probe measuring salt ion concentration combined with waterproof ultrasonic sensor monitoring tidal peak.',
+                date: '20/01/2026',
+                author: 'Huỳnh Minh Ngọc',
+                gradient: 'from-amber-950 via-slate-900 to-orange-950',
+                icon: 'activity',
+                isDefault: true
+            },
+            {
+                id: 'def-4',
+                title: 'Giao Diện Web Giám Sát & Điều Khiển Thời Gian Thực',
+                title_en: 'Real-time Web Control Dashboard',
+                category: 'software',
+                badge: '💻 Phần Mềm',
+                badge_en: '💻 Software',
+                desc: 'Giao diện web hiển thị biểu đồ diễn biến độ mặn, trạng thái đóng mở cửa van tức thời, độ trễ cập nhật < 500ms qua Firebase WebSocket.',
+                desc_en: 'Responsive web interface rendering real-time salinity graphs, gate position and status with < 500ms latency via Firebase.',
+                date: '25/01/2026',
+                author: 'Trần Duy Khang',
+                gradient: 'from-indigo-950 via-slate-900 to-blue-950',
+                icon: 'layout-dashboard',
+                isDefault: true
+            },
+            {
+                id: 'def-5',
+                title: 'Thử Nghiệm Dòng Chảy & Khả Năng Kín Nước Mô Hình',
+                title_en: 'Water Flow & Seal Hydrodynamic Testing',
+                category: 'hardware',
+                badge: '⚙️ Thử Nghiệm',
+                badge_en: '⚙️ Testing',
+                desc: 'Kiểm nghiệm gioăng cao su làm kín cửa cống dưới áp lực nước 500mm, đảm bảo không rò rỉ nước mặn vào phía kênh nội đồng ngọt.',
+                desc_en: 'Testing rubber seal performance under 500mm hydraulic pressure, ensuring zero saltwater intrusion into freshwater canals.',
+                date: '02/02/2026',
+                author: 'Lê Trọng Nam',
+                gradient: 'from-cyan-950 via-slate-900 to-blue-950',
+                icon: 'waves',
+                isDefault: true
+            },
+            {
+                id: 'def-6',
+                title: 'Hiệu Chỉnh Ngưỡng Cảnh Báo Độ Mặn Tự Động 1.5‰',
+                title_en: 'Automatic Sluice Closure at 1.5‰ Salinity Threshold',
+                category: 'software',
+                badge: '💻 Thuật Toán',
+                badge_en: '💻 Algorithm',
+                desc: 'Thuật toán an toàn kích hoạt chuông còi báo động và ra lệnh đóng cống tự động khi nồng độ muối vượt ngưỡng cho phép đối với lúa và cây ăn trái.',
+                desc_en: 'Safety algorithm triggering alarm and closing sluice automatically when salinity crosses agricultural safety threshold.',
+                date: '10/02/2026',
+                author: 'Trần Duy Khang',
+                gradient: 'from-rose-950 via-slate-900 to-red-950',
+                icon: 'alert-triangle',
+                isDefault: true
+            },
+            {
+                id: 'def-7',
+                title: 'Nhóm Nghiên Cứu Lắp Ráp Hoàn Thiện Mô Hình Thực Nghiệm',
+                title_en: 'Team Assembling Complete Prototype',
+                category: 'memory',
+                badge: '🏆 Kỷ Niệm',
+                badge_en: '🏆 Memories',
+                desc: 'Những buổi chiều miệt mài tại phòng thực hành STEM trường THPT Nguyễn Huệ cùng cô giáo hướng dẫn Trần Thị Hồng Hạnh và các thành viên.',
+                desc_en: 'Memorable afternoons assembling the prototype at Nguyen Hue High School STEM lab with supervisor Tran Thi Hong Hanh.',
+                date: '18/02/2026',
+                author: 'Nhóm Tác Giả',
+                gradient: 'from-purple-950 via-slate-900 to-pink-950',
+                icon: 'users',
+                isDefault: true
+            },
+            {
+                id: 'def-8',
+                title: 'Báo Cáo Tiến Độ & Thuyết Minh Dự Án Cống Ngăn Mặn',
+                title_en: 'Project Presentation & Defense',
+                category: 'memory',
+                badge: '🏆 Cuộc Thi',
+                badge_en: '🏆 Defense',
+                desc: 'Báo cáo giải pháp công nghệ IoT ứng dụng thực tế bảo vệ Đồng bằng sông Cửu Long trước tình trạng biến đổi khí hậu.',
+                desc_en: 'Presenting IoT solution to address saltwater intrusion challenges in the Mekong Delta region.',
+                date: '28/02/2026',
+                author: 'Nhóm Tác Giả & GVHD',
+                gradient: 'from-violet-950 via-slate-900 to-indigo-950',
+                icon: 'award',
+                isDefault: true
+            }
+        ];
+
+        // 2. STATE
+        let activeFilter = 'all';
+        let searchQuery = '';
+        let customPhotos = [];
+        let overridePhotos = {};
+        let selectedPhotoIds = []; // Danh sách ảnh đang được chọn
+        let isSelectionMode = false;
+        let currentLightboxId = null;
+        let compressedBase64 = null;
+        let currentLang = localStorage.getItem('scada_lang') || 'vi';
+
+        // Tải số like từ LocalStorage
+        try {
+            window.likesData = JSON.parse(localStorage.getItem('scada_photo_likes') || '{}');
+        } catch(e) {
+            window.likesData = {};
+        }
+
+        window.showToast = function(msg) {
+            const toast = document.getElementById('toast');
+            const text = document.getElementById('toast-text');
+            if (!toast || !text) return;
+            text.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        };
+
+        function isUserAdmin() {
+            const role = localStorage.getItem('userRole');
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            return isLoggedIn && (role === 'admin');
+        }
+
+        try { customPhotos = JSON.parse(localStorage.getItem('scada_custom_album_photos') || '[]'); } catch(e) { customPhotos = []; }
+        try { overridePhotos = JSON.parse(localStorage.getItem('scada_override_photos') || '{}'); } catch(e) { overridePhotos = {}; }
+
+        // 3. TỪ ĐIỂN ĐA NGÔN NGỮ
+        const translations = {
+            vi: {
+                brand_title: "ALBUM DỰ ÁN",
+                brand_school: "NKN Labs • STEM Gallery",
+                nav_dashboard: "Bảng Điều Khiển",
+                nav_album: "Album Kỷ Niệm",
+                nav_contact: "Liên Hệ & Hỗ Trợ",
+                btn_login: "Đăng Nhập",
+                btn_add_photo: "Thêm Ảnh Mới",
+                hero_badge: "KHO LƯU TRỮ HÌNH ẢNH & KỶ NIỆM DỰ ÁN",
+                hero_title_1: "Hành Trình Nghiên Cứu &",
+                hero_title_2: "Chế Tạo Cống Ngăn Mặn",
+                hero_sub: "Ghi lại toàn bộ những khoảnh khắc chế tạo cơ khí, đo kiểm cảm biến độ mặn, thiết kế mạch vi điều khiển ESP32, lập trình hệ thống web và các kỷ niệm đáng nhớ của nhóm tác giả.",
+                filter_all: "Tất Cả",
+                filter_hardware: "⚙️ Cơ Khí & Cống",
+                filter_circuit: "⚡ Mạch & ESP32",
+                filter_software: "💻 Phần Mềm & Web",
+                filter_memory: "🏆 Kỷ Niệm Nhóm",
+                filter_other: "📁 Khác",
+                empty_title: "Không tìm thấy hình ảnh nào",
+                empty_desc: "Thử tìm bằng từ khóa khác hoặc chọn chuyên mục khác.",
+                upload_modal_title: "Thêm Ảnh Mới Vào Album",
+                upload_modal_sub: "Tự động nén HTML5 Canvas - Siêu nhẹ, lưu tức thì",
+                upload_choose_label: "Chọn ảnh từ thiết bị",
+                upload_title_label: "Tiêu đề ảnh (Tiếng Việt)",
+                upload_category_label: "Chuyên mục",
+                upload_desc_label: "Mô tả ngắn",
+                upload_btn_submit: "Lưu Vào Album Dự Án",
+                footer_authors: "Tác giả: Lê Trọng Nam, Trần Duy Khang, Huỳnh Minh Ngọc | GVHD: Trần Thị Hồng Hạnh"
+            },
+            en: {
+                brand_title: "PROJECT GALLERY",
+                brand_school: "Nguyen Hue High School",
+                nav_dashboard: "Dashboard",
+                nav_album: "Memories Album",
+                nav_contact: "Contact & Support",
+                btn_login: "Sign In",
+                btn_add_photo: "Add Photo",
+                hero_badge: "PROJECT GALLERY & MEMORIES ARCHIVE",
+                hero_title_1: "Journey of Research &",
+                hero_title_2: "Building the Smart Sluice Gate",
+                hero_sub: "Documenting mechanical manufacturing, salinity sensor calibration, ESP32 microcontroller design, real-time web interface programming and memorable moments.",
+                filter_all: "All",
+                filter_hardware: "⚙️ Hardware & Gate",
+                filter_circuit: "⚡ Circuits & ESP32",
+                filter_software: "💻 Software & Web",
+                filter_memory: "🏆 Team Memories",
+                filter_other: "📁 Other",
+                empty_title: "No photos found",
+                empty_desc: "Try a different search query or select another category.",
+                upload_modal_title: "Add New Photo To Album",
+                upload_modal_sub: "Client-side Canvas compression - Zero network lag",
+                upload_choose_label: "Select image from device",
+                upload_title_label: "Photo Title (Vietnamese)",
+                upload_category_label: "Category",
+                upload_desc_label: "Short Description",
+                upload_btn_submit: "Save To Project Album",
+                footer_authors: "Authors: Le Trong Nam, Tran Duy Khang, Huynh Minh Ngoc | Supervisor: Tran Thi Hong Hanh"
+            }
+        };
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('scada_lang', lang);
+            document.documentElement.lang = lang;
+            const btnText = document.getElementById('lang-btn-text');
+            if (btnText) btnText.textContent = lang === 'vi' ? '🇻🇳 VI' : '🇬🇧 EN';
+            document.querySelectorAll('.drawer-lang-btn').forEach(el => el.textContent = lang === 'vi' ? '🇻🇳 VI' : '🇬🇧 EN');
+
+            const dict = translations[lang] || translations.vi;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) el.textContent = dict[key];
+            });
+
+            renderGallery();
+        }
+
+        window.toggleLanguage = function() {
+            applyLanguage(currentLang === 'vi' ? 'en' : 'vi');
+        };
+
+        // 4. DANH SÁCH ẢNH & ĐÈ DỮ LIỆU ĐÃ CHỈNH SỬA
+        function getAllPhotos() {
+            let customList = window.cloudCustomPhotos;
+            if (!customList || customList.length === 0) {
+                try { customList = JSON.parse(localStorage.getItem('scada_custom_album_photos') || '[]'); } catch(e) { customList = []; }
+            }
+
+            let cloudDel = window.cloudDeletedIds || [];
+            let localDel = [];
+            try { localDel = JSON.parse(localStorage.getItem('scada_deleted_photo_ids') || '[]'); } catch(e) {}
+            const allDeleted = Array.from(new Set([...cloudDel, ...localDel]));
+
+            const list = [...customList, ...DEFAULT_PHOTOS].filter(p => !allDeleted.includes(p.id));
+
+            const allOverrides = { ...overridePhotos, ...(window.cloudOverrides || {}) };
+
+            return list.map(p => {
+                if (allOverrides[p.id]) {
+                    return { ...p, ...allOverrides[p.id] };
+                }
+                return p;
+            });
+        }
+
+        window.syncAndRenderGallery = function() {
+            renderGallery();
+            checkUrlDeepLink();
+        };
+
+        // Lấy số like của 1 ảnh
+        function getLikesCount(photoId) {
+            if (window.likesData && typeof window.likesData[photoId] === 'number') {
+                return window.likesData[photoId];
+            }
+            return 0;
+        }
+
+        // 5. HIỂN THỊ GALLERY VỚI NÚT CHỌN ẢNH (HÌNH TRÒN), NÚT TIM & MENU 3 CHẤM
+        function renderGallery() {
+            const container = document.getElementById('gallery-container');
+            const emptyEl = document.getElementById('empty-state');
+            const countBadge = document.getElementById('photo-count-badge');
+            const btnReset = document.getElementById('btn-reset-photos');
+            const all = getAllPhotos();
+            const isAdmin = isUserAdmin();
+
+            let deletedList = [];
+            try { deletedList = JSON.parse(localStorage.getItem('scada_deleted_photo_ids') || '[]'); } catch(e) {}
+            if (btnReset) {
+                if (isAdmin && deletedList.length > 0) btnReset.classList.remove('hidden');
+                else btnReset.classList.add('hidden');
+            }
+
+            const filtered = all.filter(p => {
+                const matchCategory = activeFilter === 'all' || p.category === activeFilter;
+                const q = searchQuery.toLowerCase().trim();
+                const titleStr = ((currentLang === 'en' && p.title_en) ? p.title_en : p.title).toLowerCase();
+                const descStr = ((currentLang === 'en' && p.desc_en) ? p.desc_en : p.desc).toLowerCase();
+                const matchQuery = !q || titleStr.includes(q) || descStr.includes(q) || (p.author && p.author.toLowerCase().includes(q));
+                return matchCategory && matchQuery;
+            });
+
+            countBadge.textContent = `${filtered.length} ${currentLang === 'en' ? 'Photos' : 'Ảnh'}`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+            container.innerHTML = filtered.map((item) => {
+                const title = (currentLang === 'en' && item.title_en) ? item.title_en : item.title;
+                const desc = (currentLang === 'en' && item.desc_en) ? item.desc_en : item.desc;
+                const badge = (currentLang === 'en' && item.badge_en) ? item.badge_en : item.badge;
+                const isLiked = localStorage.getItem('album_liked_' + item.id) === 'true';
+                const likeCount = getLikesCount(item.id);
+                const isSelected = selectedPhotoIds.includes(item.id);
+
+                let visualContent = '';
+                if (item.dataUrl) {
+                    visualContent = `
+                        <div class="w-full aspect-[4/3] bg-black overflow-hidden relative">
+                            <img src="${item.dataUrl}" alt="${title}" class="card-img w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
+                        </div>
+                    `;
+                } else {
+                    visualContent = `
+                        <div class="w-full aspect-[4/3] bg-gradient-to-br ${item.gradient || 'from-slate-900 to-indigo-950'} flex flex-col items-center justify-center relative overflow-hidden p-6 border-b border-slate-800">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08)_0,transparent_70%)]"></div>
+                            <div class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-lg mb-2 z-10 card-img">
+                                <i data-lucide="${item.icon || 'image'}" class="w-7 h-7"></i>
+                            </div>
+                            <span class="text-[11px] font-black uppercase tracking-widest text-purple-300/80 z-10">HỆ THỐNG CỐNG THÔNG MINH</span>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="gallery-card glass-card rounded-3xl overflow-hidden flex flex-col justify-between cursor-pointer group relative ${isSelected ? 'ring-2 ring-purple-500 bg-purple-950/20' : ''}" onclick="handleCardClick('${item.id}', event)">
+                        
+                        <!-- DẤU TRÒN TÍCH CHỌN ẢNH Ở GÓC TRÊN BÊN PHẢI -->
+                        <button type="button" onclick="toggleSelectPhoto('${item.id}', event)" 
+                                class="photo-select-checkbox absolute top-3 right-3 z-20 w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center cursor-pointer shadow-lg ${isSelected ? 'bg-purple-600 border-white text-white scale-105 shadow-purple-500/40' : (isSelectionMode ? 'bg-black/60 border-white/80 text-transparent' : 'bg-black/40 border-white/40 text-transparent opacity-0 group-hover:opacity-100 hover:border-white hover:bg-black/80')}" title="Chọn ảnh">
+                            <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                        </button>
+
+                        ${visualContent}
+
+                        <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-400/30">
+                                        ${badge}
+                                    </span>
+                                    <span class="text-[11px] text-slate-400 font-semibold">${item.date}</span>
+                                </div>
+                                <h3 class="text-sm font-extrabold text-white leading-snug line-clamp-2 group-hover:text-purple-300 transition-colors">
+                                    ${title}
+                                </h3>
+                                <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed font-medium">
+                                    ${desc}
+                                </p>
+                            </div>
+
+                            <!-- Footer card: Tác giả + Nút Tim Like + Menu 3 chấm ⋮ -->
+                            <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] relative">
+                                <span class="font-bold text-slate-400 flex items-center gap-1.5 truncate max-w-[120px]" title="Người đăng: ${item.author || 'Nhóm Tác Giả'}">
+                                    <i data-lucide="user" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+                                    <span class="truncate">${item.author || 'Nhóm Tác Giả'}</span>
+                                </span>
+
+                                <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation();">
+                                    <!-- NÚT TIM LIKE REAL-TIME -->
+                                    <button type="button" onclick="handleLikeClick('${item.id}', event)" 
+                                            class="like-btn-${item.id} px-2 py-1 rounded-xl border transition-all flex items-center gap-1 cursor-pointer ${isLiked ? 'bg-rose-950/50 border-rose-500/50 text-rose-400' : 'bg-slate-800/80 border-slate-700/80 text-slate-400 hover:text-rose-400'}" title="Thả tim">
+                                        <i data-lucide="heart" class="w-3.5 h-3.5 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}"></i>
+                                        <span class="text-[11px] font-black like-count-${item.id}">${likeCount}</span>
+                                    </button>
+
+                                    <!-- NÚT 3 CHẤM DỌC ⋮ MENU -->
+                                    <div class="relative">
+                                        <button type="button" onclick="toggleCardMenu('${item.id}', event)" 
+                                                class="w-7 h-7 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700/80 text-slate-300 hover:text-white flex items-center justify-center transition-all cursor-pointer" title="Tùy chọn">
+                                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                                        </button>
+
+                                        <!-- MENU POPUP -->
+                                        <div id="card-menu-${item.id}" class="hidden absolute right-0 bottom-9 w-44 rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-1.5 z-30 space-y-1 text-xs font-semibold backdrop-blur-md">
+                                            <button type="button" onclick="copyPhotoShareLink('${item.id}', event)" class="w-full px-3 py-1.5 rounded-xl hover:bg-slate-800 text-slate-200 hover:text-white flex items-center gap-2 text-left cursor-pointer">
+                                                <i data-lucide="share-2" class="w-3.5 h-3.5 text-blue-400"></i>
+                                                <span>Chia sẻ liên kết</span>
+                                            </button>
+                                            <button type="button" onclick="openLightbox('${item.id}')" class="w-full px-3 py-1.5 rounded-xl hover:bg-slate-800 text-slate-200 hover:text-white flex items-center gap-2 text-left cursor-pointer">
+                                                <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-purple-400"></i>
+                                                <span>Xem toàn cảnh</span>
+                                            </button>
+                                            ${isAdmin ? `
+                                                <div class="border-t border-slate-800 my-1"></div>
+                                                <button type="button" onclick="openEditModal('${item.id}', event)" class="w-full px-3 py-1.5 rounded-xl hover:bg-slate-800 text-amber-300 hover:text-amber-200 flex items-center gap-2 text-left cursor-pointer">
+                                                    <i data-lucide="edit-3" class="w-3.5 h-3.5 text-amber-400"></i>
+                                                    <span>Chỉnh sửa ảnh</span>
+                                                </button>
+                                                <button type="button" onclick="deleteAnyPhoto('${item.id}', event)" class="w-full px-3 py-1.5 rounded-xl hover:bg-rose-950/40 text-rose-400 hover:text-rose-300 flex items-center gap-2 text-left cursor-pointer">
+                                                    <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+                                                    <span>Xóa ảnh</span>
+                                                </button>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+            updateBulkActionBarUI();
+        }
+
+        // 6. XỬ LÝ CHỌN ẢNH (SELECTION / BULK ACTIONS)
+        window.handleCardClick = function(id, e) {
+            if (isSelectionMode) {
+                toggleSelectPhoto(id, e);
+            } else {
+                openLightbox(id);
+            }
+        };
+
+        window.toggleSelectionMode = function() {
+            isSelectionMode = !isSelectionMode;
+            const btn = document.getElementById('btn-toggle-select');
+            const text = document.getElementById('select-mode-text');
+            if (isSelectionMode) {
+                btn.classList.remove('bg-slate-800', 'text-slate-300');
+                btn.classList.add('bg-purple-600', 'text-white', 'border-purple-400');
+                text.textContent = 'Đang chọn...';
+                window.showToast('Chế độ chọn ảnh đã bật. Nhấp vào các ảnh để chọn!');
+            } else {
+                btn.classList.add('bg-slate-800', 'text-slate-300');
+                btn.classList.remove('bg-purple-600', 'text-white', 'border-purple-400');
+                text.textContent = 'Chọn ảnh';
+                selectedPhotoIds = [];
+            }
+            renderGallery();
+        };
+
+        window.toggleSelectPhoto = function(id, e) {
+            if (e) e.stopPropagation();
+            const index = selectedPhotoIds.indexOf(id);
+            if (index >= 0) {
+                selectedPhotoIds.splice(index, 1);
+            } else {
+                selectedPhotoIds.push(id);
+            }
+            renderGallery();
+        };
+
+        window.toggleSelectAll = function() {
+            const all = getAllPhotos();
+            if (selectedPhotoIds.length === all.length) {
+                selectedPhotoIds = [];
+            } else {
+                selectedPhotoIds = all.map(p => p.id);
+            }
+            renderGallery();
+        };
+
+        window.clearSelectedPhotos = function() {
+            selectedPhotoIds = [];
+            if (isSelectionMode) toggleSelectionMode();
+            else renderGallery();
+        };
+
+        function updateBulkActionBarUI() {
+            const bar = document.getElementById('bulk-action-bar');
+            const badge = document.getElementById('selected-count-badge');
+            const allText = document.getElementById('select-all-text');
+            const btnDelete = document.getElementById('btn-bulk-delete');
+            const all = getAllPhotos();
+
+            if (!bar) return;
+
+            if (selectedPhotoIds.length > 0) {
+                bar.classList.remove('hidden');
+                badge.textContent = `Đã chọn: ${selectedPhotoIds.length} ảnh`;
+                allText.textContent = selectedPhotoIds.length === all.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả';
+                
+                // Chỉ hiển thị nút xóa cho Admin
+                if (btnDelete) {
+                    if (isUserAdmin()) btnDelete.classList.remove('hidden');
+                    else btnDelete.classList.add('hidden');
+                }
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        window.deleteSelectedPhotos = function() {
+            if (!isUserAdmin()) {
+                alert('Chỉ Quản trị viên mới có quyền xóa ảnh!');
+                return;
+            }
+            if (selectedPhotoIds.length === 0) return;
+            if (!confirm(`Bạn có chắc chắn muốn xóa ${selectedPhotoIds.length} ảnh đã chọn khỏi album?`)) return;
+
+            // Xóa khỏi customPhotos
+            customPhotos = customPhotos.filter(p => !selectedPhotoIds.includes(p.id));
+            try { localStorage.setItem('scada_custom_album_photos', JSON.stringify(customPhotos));
+                if (typeof window.savePhotoToFirebase === 'function') {
+                    window.savePhotoToFirebase(customPhotos[custIndex]);
+                } } catch(e) {}
+
+            // Thêm vào danh sách xóa vĩnh viễn (kể cả ảnh mẫu)
+            try {
+                let deletedList = JSON.parse(localStorage.getItem('scada_deleted_photo_ids') || '[]');
+                selectedPhotoIds.forEach(id => {
+                    if (typeof window.deletePhotoFromFirebase === 'function') {
+                        window.deletePhotoFromFirebase(id);
+                    }
+                });
+                selectedPhotoIds.forEach(id => {
+                    if (!deletedList.includes(id)) deletedList.push(id);
+                });
+                localStorage.setItem('scada_deleted_photo_ids', JSON.stringify(deletedList));
+            } catch(e) {}
+
+            window.showToast(`Đã xóa ${selectedPhotoIds.length} ảnh khỏi album.`);
+            selectedPhotoIds = [];
+            renderGallery();
+        };
+
+        window.shareSelectedPhotos = function() {
+            if (selectedPhotoIds.length === 0) return;
+            const links = selectedPhotoIds.map(id => window.location.origin + window.location.pathname + '?photo=' + id).join('\n');
+            navigator.clipboard.writeText(links).then(() => {
+                window.showToast(`🔗 Đã sao chép link của ${selectedPhotoIds.length} ảnh đã chọn!`);
+            }).catch(() => {
+                prompt('Sao chép các link ảnh:', links);
+            });
+        };
+
+        // 7. XỬ LÝ NÚT TIM LIKE (CẬP NHẬT TỨC THÌ 100% CẢ TRONG LIGHTBOX LẪN NGOÀI CARD)
+        window.handleLikeClick = function(id, e) {
+            if (e) e.stopPropagation();
+            if (!id) return;
+
+            const likedKey = 'album_liked_' + id;
+            const isCurrentlyLiked = localStorage.getItem(likedKey) === 'true';
+            let currentCount = getLikesCount(id);
+
+            if (!isCurrentlyLiked) {
+                // Thích ảnh
+                localStorage.setItem(likedKey, 'true');
+                currentCount += 1;
+                window.showToast('❤️ Bạn đã thích ảnh này!');
+            } else {
+                // Bỏ thích ảnh
+                localStorage.removeItem(likedKey);
+                currentCount = Math.max(0, currentCount - 1);
+                window.showToast('Đã bỏ thích ảnh.');
+            }
+
+            // Cập nhật ngay vào bộ nhớ Local
+            if (!window.likesData) window.likesData = {};
+            window.likesData[id] = currentCount;
+            try {
+                localStorage.setItem('scada_photo_likes', JSON.stringify(window.likesData));
+            } catch(err) {}
+
+            // Cập nhật giao diện tức thì
+            window.updateAllLikeButtonsUI();
+
+            // Đồng bộ ngầm lên Firebase Realtime Database nếu có
+            if (typeof window.syncLikeToFirebase === 'function') {
+                window.syncLikeToFirebase(id, currentCount);
+            }
+        };
+
+        window.updateAllLikeButtonsUI = function() {
+            const all = getAllPhotos();
+            all.forEach(item => {
+                const isLiked = localStorage.getItem('album_liked_' + item.id) === 'true';
+                const likeCount = getLikesCount(item.id);
+
+                document.querySelectorAll('.like-btn-' + item.id).forEach(btn => {
+                    if (isLiked) {
+                        btn.className = `like-btn-${item.id} px-2 py-1 rounded-xl border transition-all flex items-center gap-1 cursor-pointer bg-rose-950/50 border-rose-500/50 text-rose-400 animate-heart`;
+                        const icon = btn.querySelector('i');
+                        if (icon) icon.className = 'w-3.5 h-3.5 fill-rose-500 text-rose-500';
+                    } else {
+                        btn.className = `like-btn-${item.id} px-2 py-1 rounded-xl border transition-all flex items-center gap-1 cursor-pointer bg-slate-800/80 border-slate-700/80 text-slate-400 hover:text-rose-400`;
+                        const icon = btn.querySelector('i');
+                        if (icon) icon.className = 'w-3.5 h-3.5';
+                    }
+                });
+
+                document.querySelectorAll('.like-count-' + item.id).forEach(el => {
+                    el.textContent = likeCount;
+                });
+            });
+
+            // Cập nhật Nút Like TRONG LIGHTBOX nếu đang mở
+            if (currentLightboxId) {
+                const isLiked = localStorage.getItem('album_liked_' + currentLightboxId) === 'true';
+                const likeCount = getLikesCount(currentLightboxId);
+                const lbBtn = document.getElementById('lightbox-like-btn');
+                const lbCount = document.getElementById('lightbox-likes-count');
+                const lbText = document.getElementById('lightbox-like-text');
+
+                if (lbBtn && lbCount && lbText) {
+                    lbCount.textContent = likeCount;
+                    if (isLiked) {
+                        lbBtn.className = 'px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer bg-rose-950/60 border-rose-500/50 text-rose-400 animate-heart';
+                        lbText.textContent = 'Đã thích';
+                        const icon = lbBtn.querySelector('i');
+                        if (icon) icon.className = 'w-4 h-4 fill-rose-500 text-rose-500';
+                    } else {
+                        lbBtn.className = 'px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300 hover:text-rose-400';
+                        lbText.textContent = 'Thích';
+                        const icon = lbBtn.querySelector('i');
+                        if (icon) icon.className = 'w-4 h-4';
+                    }
+                }
+            }
+        };
+
+        // 8. MENU 3 CHẤM DỌC
+        window.toggleCardMenu = function(id, e) {
+            if (e) e.stopPropagation();
+            document.querySelectorAll('[id^="card-menu-"]').forEach(m => {
+                if (m.id !== 'card-menu-' + id) m.classList.add('hidden');
+            });
+            const menu = document.getElementById('card-menu-' + id);
+            if (menu) menu.classList.toggle('hidden');
+        };
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('[id^="card-menu-"]').forEach(m => m.classList.add('hidden'));
+        });
+
+        // 9. CHIA SẺ LIÊN KẾT ẢNH (DEEP LINKING HOẠT ĐỘNG 100% TRONG CẢ CARD VÀ LIGHTBOX)
+        window.copyPhotoShareLink = function(id, e) {
+            if (e) e.stopPropagation();
+            if (!id) return;
+
+            const url = window.location.origin + window.location.pathname + '?photo=' + id;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    window.showToast('🔗 Đã sao chép link ảnh! Bạn có thể dán gửi cho bạn bè.');
+                }).catch(() => {
+                    prompt('Sao chép link ảnh này:', url);
+                });
+            } else {
+                prompt('Sao chép link ảnh này:', url);
+            }
+            document.querySelectorAll('[id^="card-menu-"]').forEach(m => m.classList.add('hidden'));
+        };
+
+        window.shareCurrentPhoto = function() {
+            if (!currentLightboxId) return;
+            window.copyPhotoShareLink(currentLightboxId);
+        };
+
+        // 10. LIGHTBOX TOÀN MÀN HÌNH
+        window.openLightbox = function(id) {
+            const all = getAllPhotos();
+            const item = all.find(p => p.id === id);
+            if (!item) return;
+
+            currentLightboxId = id;
+            const modal = document.getElementById('lightbox-modal');
+            const imgEl = document.getElementById('lightbox-img');
+            const titleEl = document.getElementById('lightbox-title');
+            const badgeEl = document.getElementById('lightbox-badge');
+            const descEl = document.getElementById('lightbox-desc');
+            const dateEl = document.getElementById('lightbox-date');
+            const authorNameEl = document.getElementById('lightbox-author-name');
+
+            const title = (currentLang === 'en' && item.title_en) ? item.title_en : item.title;
+            const desc = (currentLang === 'en' && item.desc_en) ? item.desc_en : item.desc;
+            const badge = (currentLang === 'en' && item.badge_en) ? item.badge_en : item.badge;
+
+            titleEl.textContent = title;
+            descEl.textContent = desc;
+            badgeEl.textContent = badge;
+            dateEl.textContent = item.date;
+            authorNameEl.textContent = item.author || 'Nhóm Tác Giả';
+
+            if (item.dataUrl) {
+                imgEl.src = item.dataUrl;
+            } else {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1200; canvas.height = 800;
+                const ctx = canvas.getContext('2d');
+                const gr = ctx.createLinearGradient(0, 0, 1200, 800);
+                gr.addColorStop(0, '#0f172a'); gr.addColorStop(0.5, '#1e1b4b'); gr.addColorStop(1, '#020617');
+                ctx.fillStyle = gr; ctx.fillRect(0, 0, 1200, 800);
+
+                ctx.fillStyle = '#a855f7'; ctx.font = 'bold 28px Inter, sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText('HỆ THỐNG CỐNG THÔNG MINH - HỆ THỐNG CỐNG THÔNG MINH', 600, 320);
+
+                ctx.fillStyle = '#ffffff'; ctx.font = 'bold 44px Inter, sans-serif';
+                ctx.fillText(title, 600, 390);
+
+                ctx.fillStyle = '#94a3b8'; ctx.font = '22px Inter, sans-serif';
+                ctx.fillText(badge + ' • ' + item.date, 600, 450);
+
+                imgEl.src = canvas.toDataURL('image/jpeg', 0.85);
+            }
+
+            modal.classList.remove('hidden');
+            window.updateAllLikeButtonsUI();
+            lucide.createIcons();
+        };
+
+        window.closeLightbox = function() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+            currentLightboxId = null;
+        };
+
+        window.handleLightboxBackdropClick = function(e) {
+            if (e.target.id === 'lightbox-modal') closeLightbox();
+        };
+
+        // 11. CHỈNH SỬA ẢNH ĐÃ UP (ADMIN ONLY - CÓ THỂ SỬA CẢ TÁC GIẢ)
+        window.openEditModal = function(id, e) {
+            if (e) e.stopPropagation();
+            if (!isUserAdmin()) {
+                alert('Chỉ Quản trị viên mới có quyền chỉnh sửa ảnh!');
+                return;
+            }
+            const all = getAllPhotos();
+            const item = all.find(p => p.id === id);
+            if (!item) return;
+
+            document.getElementById('edit-photo-id').value = item.id;
+            document.getElementById('edit-photo-title').value = item.title || '';
+            document.getElementById('edit-photo-title-en').value = item.title_en || '';
+            document.getElementById('edit-photo-author').value = item.author || '';
+            document.getElementById('edit-photo-category').value = item.category || 'hardware';
+            document.getElementById('edit-photo-date').value = item.date || '';
+            document.getElementById('edit-photo-desc').value = item.desc || '';
+
+            document.getElementById('edit-modal').classList.remove('hidden');
+            document.querySelectorAll('[id^="card-menu-"]').forEach(m => m.classList.add('hidden'));
+        };
+
+        window.closeEditModal = function() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        };
+
+        window.handleUpdatePhoto = function(e) {
+            e.preventDefault();
+            if (!isUserAdmin()) return;
+
+            const id = document.getElementById('edit-photo-id').value;
+            const title = document.getElementById('edit-photo-title').value.trim();
+            const titleEn = document.getElementById('edit-photo-title-en').value.trim() || title;
+            const author = document.getElementById('edit-photo-author').value.trim() || 'Trần Duy Khang';
+            const category = document.getElementById('edit-photo-category').value;
+            const date = document.getElementById('edit-photo-date').value.trim();
+            const desc = document.getElementById('edit-photo-desc').value.trim();
+
+            const categoryBadges = {
+                hardware: { vi: '⚙️ Cơ Khí', en: '⚙️ Hardware' },
+                circuit: { vi: '⚡ Mạch Điện', en: '⚡ Circuit' },
+                software: { vi: '💻 Phần Mềm', en: '💻 Software' },
+                memory: { vi: '🏆 Kỷ Niệm', en: '🏆 Memories' },
+                other: { vi: '📁 Khác', en: '📁 Other' }
+            };
+            const badgeObj = categoryBadges[category] || { vi: '📁 Khác', en: '📁 Other' };
+
+            const custIndex = customPhotos.findIndex(p => p.id === id);
+            if (custIndex >= 0) {
+                customPhotos[custIndex].title = title;
+                customPhotos[custIndex].title_en = titleEn;
+                customPhotos[custIndex].author = author;
+                customPhotos[custIndex].category = category;
+                customPhotos[custIndex].badge = badgeObj.vi;
+                customPhotos[custIndex].badge_en = badgeObj.en;
+                customPhotos[custIndex].date = date;
+                customPhotos[custIndex].desc = desc;
+                localStorage.setItem('scada_custom_album_photos', JSON.stringify(customPhotos));
+            } else {
+                overridePhotos[id] = {
+                    title: title,
+                    title_en: titleEn,
+                    author: author,
+                    category: category,
+                    badge: badgeObj.vi,
+                    badge_en: badgeObj.en,
+                    date: date,
+                    desc: desc
+                };
+                localStorage.setItem('scada_override_photos', JSON.stringify(overridePhotos));
+                if (typeof window.saveOverrideToFirebase === 'function') {
+                    window.saveOverrideToFirebase(id, overridePhotos[id]);
+                }
+            }
+
+            closeEditModal();
+            renderGallery();
+            window.showToast('✓ Cập nhật thông tin ảnh thành công!');
+        };
+
+        // 12. TẢI ẢNH MỚI (TỰ ĐỘNG ĐIỀN TÊN NGƯỜI ĐĂNG TỪ TÀI KHOẢN HIỆN TẠI)
+        window.openUploadModal = function() {
+            if (!isUserAdmin()) {
+                alert('Chỉ Quản trị viên mới có quyền tải ảnh!');
+                return;
+            }
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('photo-date');
+            if (dateInput) dateInput.value = today;
+
+            // Mặc định tên theo tài khoản đăng nhập hiện tại
+            const accounts = JSON.parse(localStorage.getItem('scada_accounts') || '[]');
+            const activeAcc = accounts[0] || {};
+            const loggedInName = activeAcc.displayName || localStorage.getItem('userName') || (isUserAdmin() ? 'Trần Duy Khang' : 'Người Dùng');
+            const authorInput = document.getElementById('photo-author');
+            if (authorInput) {
+                authorInput.value = loggedInName;
+            }
+
+            document.getElementById('upload-modal').classList.remove('hidden');
+        };
+
+        window.closeUploadModal = function() {
+            document.getElementById('upload-modal').classList.add('hidden');
+            document.getElementById('upload-form').reset();
+            document.getElementById('preview-box').classList.add('hidden');
+            document.getElementById('btn-save-photo').disabled = true;
+            compressedBase64 = null;
+        };
+
+        window.handleFileSelected = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const origKb = Math.round(file.size / 1024);
+            document.getElementById('orig-size-label').textContent = `Gốc: ${origKb} KB`;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1280; const MAX_HEIGHT = 960;
+                    let width = img.width; let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    compressedBase64 = canvas.toDataURL('image/jpeg', 0.72);
+                    const compKb = Math.round((compressedBase64.length * 3 / 4) / 1024);
+                    const saved = origKb > 0 ? Math.round(((origKb - compKb) / origKb) * 100) : 0;
+
+                    document.getElementById('img-preview').src = compressedBase64;
+                    document.getElementById('comp-size-label').textContent = `Đã nén: ${compKb} KB (Tiết kiệm ${Math.max(0, saved)}% dung lượng)`;
+                    document.getElementById('preview-box').classList.remove('hidden');
+                    document.getElementById('btn-save-photo').disabled = false;
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.handleSavePhoto = function(e) {
+            e.preventDefault();
+            if (!isUserAdmin() || !compressedBase64) return;
+
+            const title = document.getElementById('photo-title').value.trim();
+            const titleEn = document.getElementById('photo-title-en').value.trim() || title;
+            const author = document.getElementById('photo-author').value.trim() || 'Trần Duy Khang';
+            const category = document.getElementById('photo-category').value;
+            const desc = document.getElementById('photo-desc').value.trim() || 'Hình ảnh dự án được cập nhật.';
+            
+            const rawDate = document.getElementById('photo-date').value;
+            let dateStr = '';
+            if (rawDate) {
+                const [y, m, d] = rawDate.split('-');
+                dateStr = `${d}/${m}/${y}`;
+            } else {
+                const now = new Date();
+                dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+            }
+
+            const categoryBadges = {
+                hardware: { vi: '⚙️ Cơ Khí', en: '⚙️ Hardware' },
+                circuit: { vi: '⚡ Mạch Điện', en: '⚡ Circuit' },
+                software: { vi: '💻 Phần Mềm', en: '💻 Software' },
+                memory: { vi: '🏆 Kỷ Niệm', en: '🏆 Memories' },
+                other: { vi: '📁 Khác', en: '📁 Other' }
+            };
+            const badgeObj = categoryBadges[category] || { vi: '📁 Khác', en: '📁 Other' };
+
+            const newPhoto = {
+                id: 'cust-' + Date.now(),
+                title: title,
+                title_en: titleEn,
+                category: category,
+                badge: badgeObj.vi,
+                badge_en: badgeObj.en,
+                desc: desc,
+                desc_en: desc,
+                date: dateStr,
+                author: author,
+                dataUrl: compressedBase64,
+                isDefault: false
+            };
+
+            customPhotos.unshift(newPhoto);
+            newPhoto.timestamp = Date.now();
+            if (typeof window.savePhotoToFirebase === 'function') {
+                window.savePhotoToFirebase(newPhoto);
+            }
+            try { localStorage.setItem('scada_custom_album_photos', JSON.stringify(customPhotos)); } catch(err) {}
+
+            closeUploadModal();
+            renderGallery();
+            window.showToast('✓ Đã tải và lưu ảnh mới thành công!');
+        };
+
+        // 13. XÓA ẢNH (ADMIN ONLY)
+        window.deleteAnyPhoto = function(id, e) {
+            if (e) e.stopPropagation();
+            if (!isUserAdmin()) {
+                alert('Chỉ Quản trị viên mới có quyền xóa ảnh!');
+                return;
+            }
+            if (!confirm('Bạn có chắc chắn muốn xóa ảnh này khỏi album?')) return;
+
+            customPhotos = customPhotos.filter(p => p.id !== id);
+            try { localStorage.setItem('scada_custom_album_photos', JSON.stringify(customPhotos)); } catch(e) {}
+
+            try {
+                let deletedList = JSON.parse(localStorage.getItem('scada_deleted_photo_ids') || '[]');
+                if (typeof window.deletePhotoFromFirebase === 'function') {
+                window.deletePhotoFromFirebase(id);
+            }
+            if (!deletedList.includes(id)) {
+                    deletedList.push(id);
+                    localStorage.setItem('scada_deleted_photo_ids', JSON.stringify(deletedList));
+                }
+            } catch(e) {}
+
+            renderGallery();
+            window.showToast('Đã xóa ảnh khỏi album.');
+        };
+
+        window.resetDeletedPhotos = function() {
+            if (!confirm('Bạn có muốn khôi phục lại các ảnh mặc định đã bị xóa?')) return;
+            localStorage.removeItem('scada_deleted_photo_ids');
+            window.cloudDeletedIds = [];
+            if (typeof window.resetDeletedFromFirebase === 'function') {
+                window.resetDeletedFromFirebase();
+            }
+            renderGallery();
+            window.showToast('✓ Đã khôi phục các ảnh mặc định!');
+        };
+
+        // 14. BỘ LỌC & TÌM KIẾM
+        window.setFilter = function(filter) {
+            activeFilter = filter;
+            document.querySelectorAll('#filter-pills .filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.remove('bg-slate-800', 'text-slate-300');
+                    btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'shadow-purple-500/20');
+                } else {
+                    btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md', 'shadow-purple-500/20');
+                    btn.classList.add('bg-slate-800', 'text-slate-300');
+                }
+            });
+            renderGallery();
+        };
+
+        window.handleSearch = function(q) {
+            searchQuery = q;
+            renderGallery();
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeLightbox();
+                closeUploadModal();
+                closeEditModal();
+                clearSelectedPhotos();
+            }
+        });
+
+        // 15. PHÂN QUYỀN HEADER & KIỂM TRA DEEP LINK (?photo=xyz)
+        function getActiveUserAvatar() {
+            if (window.activeUserPhotoURL) return window.activeUserPhotoURL;
+            const direct = localStorage.getItem('scada_active_avatar');
+            if (direct) return direct;
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith('user_avatar_')) {
+                    const val = localStorage.getItem(k);
+                    if (val) return val;
+                }
+            }
+            try {
+                const accounts = JSON.parse(localStorage.getItem('scada_accounts') || '[]');
+                if (accounts.length > 0 && accounts[0].photoURL) {
+                    return accounts[0].photoURL;
+                }
+            } catch(e) {}
+            return localStorage.getItem('userAvatar') || '';
+        }
+
+        function syncAlbumPermissions() {
+            const container = document.getElementById('album-header-auth-container');
+            const btnUpload = document.getElementById('btn-open-upload');
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userRole = localStorage.getItem('userRole') || 'guest';
+            const isAdmin = isLoggedIn && (userRole === 'admin');
+
+            if (btnUpload) {
+                if (isAdmin) btnUpload.classList.remove('hidden');
+                else btnUpload.classList.add('hidden');
+            }
+
+            if (container) {
+                if (isLoggedIn && isAdmin) {
+                    const accounts = JSON.parse(localStorage.getItem('scada_accounts') || '[]');
+                    const activeAcc = accounts[0] || {};
+                    const userName = window.activeUserDisplayName || activeAcc.displayName || 'Duy Khang';
+                    const userAvatar = getActiveUserAvatar();
+
+                    container.innerHTML = `
+                        <a href="index.html" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-white transition-all">
+                            ${userAvatar ? `<img src="${userAvatar}" class="w-5 h-5 rounded-full object-cover">` : `<div class="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px]">DK</div>`}
+                            <span class="max-w-[90px] truncate hidden sm:inline">${userName}</span>
+                            <span class="text-[10px] text-sky-400 font-black">👑</span>
+                        </a>
+                    `;
+                } else if (isLoggedIn && (userRole === 'guest' || userRole === 'viewer')) {
+                    container.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs font-bold text-slate-300">
+                                <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>Khách</span>
+                            </div>
+                            <a href="login.html" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all shadow-md shadow-purple-500/20 active:scale-95 cursor-pointer" title="Đăng nhập tài khoản Quản trị">
+                                <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                                <span data-i18n="btn_login">Đăng Nhập</span>
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <a href="login.html" id="btn-album-login" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all active:scale-95">
+                            <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                            <span data-i18n="btn_login">Đăng Nhập</span>
+                        </a>
+                    `;
+                }
+            }
+            lucide.createIcons();
+        }
+
+        // Tự động mở ảnh nếu URL có chứa ?photo=...
+        function checkUrlDeepLink() {
+            const params = new URLSearchParams(window.location.search);
+            const photoId = params.get('photo');
+            if (photoId) {
+                setTimeout(() => {
+                    openLightbox(photoId);
+                }, 300);
+            }
+        }
+
+        window.toggleMobileDrawer = function(open) {
+            const backdrop = document.getElementById('mobile-drawer-backdrop');
+            const drawer = document.getElementById('mobile-drawer');
+            if (!drawer || !backdrop) return;
+            if (open) {
+                backdrop.classList.remove('hidden');
+                setTimeout(() => drawer.classList.remove('-translate-x-full'), 10);
+            } else {
+                drawer.classList.add('-translate-x-full');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+            lucide.createIcons();
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            syncAlbumPermissions();
+            applyLanguage(currentLang);
+            checkUrlDeepLink();
+            updateAllLikeButtonsUI();
+        });
+    </script>
+</body>
+</html>

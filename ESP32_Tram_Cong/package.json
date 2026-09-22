@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "test": "node tests/run_all_tests.js"
+  },
+  "dependencies": {
+    "puppeteer": "^25.8.0"
+  }
+}

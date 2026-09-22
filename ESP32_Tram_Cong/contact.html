@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Liên Hệ & Hỗ Trợ | Hệ Thống Cống Ngăn Mặn Thông Minh</title>
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Tailwind CSS & Lucide Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts Inter -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        /* iOS Safari Momentum Scrolling & Hide Scrollbars */
+        .ios-touch-scroll {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .ios-touch-scroll::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.6);
+        }
+        .glass-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 20px 30px -10px rgba(14, 165, 233, 0.15);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-slate-950 text-slate-100 relative overflow-x-hidden selection:bg-blue-600 selection:text-white">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 pointer-events-none -z-20"></div>
+    <div class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-30 pointer-events-none -z-10"></div>
+    <div class="fixed -top-40 -right-40 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed -bottom-40 -left-40 w-96 h-96 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+    <!-- NAVIGATION BAR -->
+    <header class="sticky top-0 z-50 glass-card border-b border-slate-800/80 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand (Trơ ra, không chuyển trang khi click) -->
+            <div class="flex items-center gap-2.5 select-none cursor-default">
+                <!-- Hamburger Button (Mobile Only) -->
+                <button type="button" onclick="toggleMobileDrawer(true)" class="md:hidden p-2 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 hover:text-white active:scale-95 transition-all cursor-pointer shrink-0" title="Mở menu">
+                    <i data-lucide="menu" class="w-4 h-4 text-blue-400"></i>
+                </button>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+                    <i data-lucide="waves" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="text-sm font-black tracking-wide text-white flex items-center gap-1.5">
+                        <span data-i18n="brand_title">CỐNG THÔNG MINH</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 border border-blue-400/30 text-blue-300 font-bold uppercase">IoT STEM</span>
+                    </div>
+                    <div class="text-[11px] text-blue-300/80 font-medium">NKN Labs • SCADA</div>
+                </div>
+            </div>
+
+            <!-- Nav Links Desktop -->
+            <nav class="hidden md:flex items-center gap-1">
+                <a href="index.html" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-2">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-blue-400"></i>
+                    <span data-i18n="nav_dashboard">Bảng Điều Khiển</span>
+                </a>
+                <a href="album.html" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all flex items-center gap-2">
+                    <i data-lucide="images" class="w-4 h-4 text-purple-400"></i>
+                    <span data-i18n="nav_album">Album Kỷ Niệm</span>
+                </a>
+                <a href="contact.html" class="px-3.5 py-2 rounded-xl text-xs font-bold text-blue-400 bg-blue-900/30 border border-blue-500/30 flex items-center gap-2">
+                    <i data-lucide="mail" class="w-4 h-4 text-blue-400"></i>
+                    <span data-i18n="nav_contact">Liên Hệ & Hỗ Trợ</span>
+                </a>
+            </nav>
+
+            <!-- Actions Right -->
+            <div class="flex items-center gap-2.5">
+                <!-- Language Toggle -->
+                <button type="button" onclick="toggleLanguage()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 transition-all shadow-sm active:scale-95 cursor-pointer">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-blue-400"></i>
+                    <span id="lang-btn-text">🇻🇳 VI</span>
+                </button>
+
+                <!-- Dynamic Auth Button -->
+                <div id="header-auth-container">
+                    <a href="login.html" id="btn-header-login" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all active:scale-95">
+                        <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                        <span data-i18n="btn_login">Đăng Nhập</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+            </div>
+    </header>
+
+    <!-- MOBILE SLIDE-OUT DRAWER (Chuẩn 3 gạch như index.html) -->
+    <div id="mobile-drawer-backdrop" onclick="toggleMobileDrawer(false)" class="hidden fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm transition-opacity duration-300"></div>
+
+    <aside id="mobile-drawer" class="fixed top-0 left-0 bottom-0 w-[280px] z-[80] bg-slate-900/98 border-r border-slate-800 shadow-2xl flex flex-col justify-between p-5 transform -translate-x-full transition-transform duration-300 ease-out select-none">
+        <div class="space-y-6">
+            <!-- Drawer Header -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+                        <i data-lucide="waves" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-black text-white uppercase tracking-wider">CỐNG THÔNG MINH</div>
+                        <div class="text-[10px] text-blue-300/80 font-medium">NKN Labs • SCADA</div>
+                    </div>
+                </div>
+                <button type="button" onclick="toggleMobileDrawer(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-2 text-xs font-bold">
+                <a href="index.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-blue-400"></i>
+                    <span data-i18n="nav_dashboard">Bảng Điều Khiển (Giám Sát)</span>
+                </a>
+                <a href="album.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+                    <i data-lucide="images" class="w-4 h-4 text-purple-400"></i>
+                    <span data-i18n="nav_album">Album Kỷ Niệm Dự Án</span>
+                </a>
+                <a href="contact.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-blue-300 bg-blue-950/60 border border-blue-500/30 transition-all">
+                    <i data-lucide="mail" class="w-4 h-4 text-blue-400"></i>
+                    <span data-i18n="nav_contact">Liên Hệ & Hỗ Trợ</span>
+                </a>
+                <a href="login.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all">
+                    <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
+                    <span data-i18n="btn_login">Tài Khoản & Đăng Nhập</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Drawer Footer -->
+        <div class="border-t border-slate-800 pt-4 space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] text-slate-400 font-bold">Ngôn ngữ</span>
+                <button type="button" onclick="toggleLanguage()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 cursor-pointer">
+                    <i data-lucide="globe" class="w-3.5 h-3.5 text-blue-400"></i>
+                    <span class="drawer-lang-btn">🇻🇳 VI</span>
+                </button>
+            </div>
+            <p class="text-[10px] text-slate-500 text-center font-medium">© 2026 NKN Labs - Cống Thông Minh</p>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+
+        <!-- HERO SECTION -->
+        <section class="text-center space-y-4 max-w-3xl mx-auto">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-black uppercase tracking-wider shadow-sm">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span data-i18n="hero_badge">Dự Án Nghiên Cứu Khoa Học & STEM</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                <span data-i18n="hero_title_1">Thông Tin Liên Hệ &</span><br class="hidden sm:inline">
+                <span class="bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent" data-i18n="hero_title_2">Hỗ Trợ Kỹ Thuật Dự Án</span>
+            </h1>
+            <p class="text-sm sm:text-base text-slate-400 leading-relaxed font-medium" data-i18n="hero_subtitle">
+                Đề tài: "Hệ thống giám sát và điều khiển cống ngăn mặn thông minh ứng dụng IoT trên nền tảng vi điều khiển ESP32". Hãy liên hệ với nhóm nghiên cứu hoặc gửi tin nhắn hỗ trợ trực tiếp bên dưới.
+            </p>
+        </section>
+
+        <!-- SUPERVISOR CARD (Cô Trần Thị Hồng Hạnh) -->
+        <section class="max-w-4xl mx-auto">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border-cyan-500/30 relative overflow-hidden shadow-xl">
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10 text-center sm:text-left">
+                    <!-- AVATAR CÔ GIÁO HƯỚNG DẪN -->
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-rose-500 via-purple-600 to-cyan-500 p-1 shadow-xl shadow-purple-500/20 flex-shrink-0 relative">
+                        <img src="avatar_gvhd.jpg" alt="Cô Trần Thị Hồng Hạnh" class="w-full h-full object-cover rounded-3xl shadow-inner">
+                        <span class="absolute -bottom-1 -right-1 bg-purple-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-full border border-slate-900 shadow">GVHD</span>
+                    </div>
+
+                    <div class="flex-1 space-y-2">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-400/30 text-purple-300 text-xs font-black uppercase tracking-wider">
+                            <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                            <span data-i18n="gvhd_badge">Giáo Viên Hướng Dẫn</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-black text-white flex items-center justify-center sm:justify-start gap-2">
+                            <span data-i18n="gvhd_name">Cô Trần Thị Hồng Hạnh</span>
+                            <!-- Tích Xanh cho Cô Giáo -->
+                            <svg class="w-5 h-5 text-sky-400 inline-block shrink-0" viewBox="0 0 24 24" fill="currentColor" title="Giáo viên hướng dẫn đã xác minh">
+                                <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                            </svg>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-cyan-300 font-semibold" data-i18n="gvhd_school">Trường THPT Nguyễn Huệ</p>
+                        <p class="text-xs text-slate-400 leading-relaxed pt-1" data-i18n="gvhd_desc">
+                            Người chỉ đạo, hướng dẫn phương pháp nghiên cứu khoa học, bảo trợ kỹ thuật và định hướng ứng dụng thực tiễn giải pháp cống ngăn mặn tự động bảo vệ đất canh tác và nguồn nước sinh hoạt.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEAM MEMBERS SECTION (12A8 - THPT Nguyễn Huệ + Nút FB chính thức + Email) -->
+        <section class="space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-xl sm:text-3xl font-extrabold text-white" data-i18n="team_section_title">Nhóm Tác Giả Nghiên Cứu</h2>
+                <p class="text-xs sm:text-sm text-slate-400" data-i18n="team_section_sub">Đội ngũ phát triển & sáng lập NKN Labs</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- 1. Lê Trọng Nam (Trái) -->
+                <div class="glass-card glass-card-hover rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3.5">
+                            <!-- AVATAR NAM -->
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-green-500 p-0.5 shadow-lg shadow-emerald-500/20 shrink-0">
+                                <img src="avatar_nam.jpg" alt="Lê Trọng Nam" class="w-full h-full object-cover rounded-2xl">
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <h3 class="text-base font-extrabold text-white">Lê Trọng Nam</h3>
+                                    <!-- Tích Xanh Nam -->
+                                    <svg class="w-4 h-4 text-sky-400 inline-block shrink-0" viewBox="0 0 24 24" fill="currentColor" title="Thành viên đã xác minh">
+                                        <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block" data-i18n="role_nam">Thiết Kế Mô Hình Cống</span>
+                                <span class="text-[10px] text-slate-400 font-medium">12A8 - THPT Nguyễn Huệ</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-300 leading-relaxed" data-i18n="desc_nam">
+                            Phụ trách thiết kế và gia công mô hình cống ngăn mặn, hoàn thiện cấu trúc cửa van và kiểu dáng tổng thể của mô hình.
+                        </p>
+                    </div>
+
+                    <!-- Action row: Nút Facebook Vector SVG chính thức + Hộp Email có nút Copy -->
+                    <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center gap-2">
+                        <a href="https://www.facebook.com/t.nam.983960" target="_blank" rel="noopener noreferrer" 
+                           class="w-9 h-9 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white flex items-center justify-center transition-all shadow-md shadow-[#1877F2]/25 active:scale-95 shrink-0" title="Facebook Lê Trọng Nam">
+                            <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                        <div class="flex-1 flex items-center justify-between min-w-0 bg-slate-900/90 border border-slate-700/70 rounded-xl px-2.5 py-1.5 text-xs">
+                            <span class="text-slate-300 truncate text-[11px] font-medium mr-1">letrongnam.bte@gmail.com</span>
+                            <button type="button" onclick="copyEmail('letrongnam.bte@gmail.com', this)" 
+                                    class="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all shrink-0 active:scale-95 cursor-pointer" title="Sao chép Email">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Trần Duy Khang (Giữa) -->
+                <div class="glass-card glass-card-hover rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3.5">
+                            <!-- AVATAR KHANG -->
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 p-0.5 shadow-lg shadow-blue-500/20 shrink-0">
+                                <img src="avatar_khang.jpg" alt="Trần Duy Khang" class="w-full h-full object-cover rounded-2xl">
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <h3 class="text-base font-extrabold text-white">Trần Duy Khang</h3>
+                                    <!-- Tích Xanh Khang -->
+                                    <svg class="w-4 h-4 text-sky-400 inline-block shrink-0" viewBox="0 0 24 24" fill="currentColor" title="Quản trị viên đã xác minh">
+                                        <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider block" data-i18n="role_khang">Kiến Trúc Hệ Thống & Nền Tảng Số</span>
+                                <span class="text-[10px] text-slate-400 font-medium">12A8 - THPT Nguyễn Huệ</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-300 leading-relaxed" data-i18n="desc_khang">
+                            Phụ trách thiết kế kiến trúc hệ thống, xây dựng nền tảng web điều khiển thời gian thực, đồng bộ dữ liệu đám mây và tối ưu hóa giải pháp vận hành tự động.
+                        </p>
+                    </div>
+
+                    <!-- Action row: Nút Facebook Vector SVG chính thức + Hộp Email có nút Copy -->
+                    <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center gap-2">
+                        <a href="https://www.facebook.com/duy.khangg.344156/" target="_blank" rel="noopener noreferrer" 
+                           class="w-9 h-9 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white flex items-center justify-center transition-all shadow-md shadow-[#1877F2]/25 active:scale-95 shrink-0" title="Facebook Trần Duy Khang">
+                            <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                        <div class="flex-1 flex items-center justify-between min-w-0 bg-slate-900/90 border border-slate-700/70 rounded-xl px-2.5 py-1.5 text-xs">
+                            <span class="text-slate-300 truncate text-[11px] font-medium mr-1">tranduykhang1009@gmail.com</span>
+                            <button type="button" onclick="copyEmail('tranduykhang1009@gmail.com', this)" 
+                                    class="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all shrink-0 active:scale-95 cursor-pointer" title="Sao chép Email">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Huỳnh Minh Ngọc (Phải) -->
+                <div class="glass-card glass-card-hover rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3.5">
+                            <!-- AVATAR NGỌC -->
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-600 to-yellow-500 p-0.5 shadow-lg shadow-amber-500/20 shrink-0">
+                                <img src="avatar_ngoc.jpg" alt="Huỳnh Minh Ngọc" class="w-full h-full object-cover rounded-2xl">
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <h3 class="text-base font-extrabold text-white">Huỳnh Minh Ngọc</h3>
+                                    <!-- Tích Xanh Ngọc -->
+                                    <svg class="w-4 h-4 text-sky-400 inline-block shrink-0" viewBox="0 0 24 24" fill="currentColor" title="Thành viên đã xác minh">
+                                        <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider block" data-i18n="role_ngoc">Kỹ Thuật Phần Cứng & Vẽ 3D</span>
+                                <span class="text-[10px] text-slate-400 font-medium">12A8 - THPT Nguyễn Huệ</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-300 leading-relaxed" data-i18n="desc_ngoc">
+                            Phụ trách thiết kế bản vẽ 3D các chi tiết, lắp ráp mạch điện, đấu nối hệ thống dây tín hiệu và các khối cảm biến vận hành.
+                        </p>
+                    </div>
+
+                    <!-- Action row: Nút Facebook Vector SVG chính thức + Hộp Email có nút Copy -->
+                    <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center gap-2">
+                        <a href="https://www.facebook.com/ngoc.minh.111141" target="_blank" rel="noopener noreferrer" 
+                           class="w-9 h-9 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white flex items-center justify-center transition-all shadow-md shadow-[#1877F2]/25 active:scale-95 shrink-0" title="Facebook Huỳnh Minh Ngọc">
+                            <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                        <div class="flex-1 flex items-center justify-between min-w-0 bg-slate-900/90 border border-slate-700/70 rounded-xl px-2.5 py-1.5 text-xs">
+                            <span class="text-slate-300 truncate text-[11px] font-medium mr-1">mngoc6400@gmail.com</span>
+                            <button type="button" onclick="copyEmail('mngoc6400@gmail.com', this)" 
+                                    class="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all shrink-0 active:scale-95 cursor-pointer" title="Sao chép Email">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CONTACT & FEEDBACK FORM (Gửi trực tiếp qua TELEGRAM BOT) -->
+        <section class="max-w-3xl mx-auto glass-card rounded-3xl p-6 sm:p-10 space-y-6">
+            <div class="text-center space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-black uppercase tracking-wider">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                    <span data-i18n="form_badge">Hòm Thư Trực Tuyến & Telegram</span>
+                </div>
+                <h3 class="text-xl sm:text-3xl font-extrabold text-white" data-i18n="form_title">Gửi Ý Kiến & Yêu Cầu Hỗ Trợ</h3>
+                <p class="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto" data-i18n="form_desc">
+                    Tin nhắn của bạn sẽ được gửi thẳng tới điện thoại Telegram của đội ngũ phát triển ngay lập tức để được hỗ trợ giải đáp kịp thời.
+                </p>
+            </div>
+
+            <form id="contact-form" onsubmit="handleSendFeedback(event)" class="space-y-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-300" data-i18n="form_name_label">Họ và tên của bạn</label>
+                        <input type="text" id="fb-name" required placeholder="Nguyễn Văn A" 
+                               class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700/80 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-white placeholder-slate-500 text-base sm:text-xs">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-slate-300" data-i18n="form_email_label">Email hoặc Số điện thoại</label>
+                        <input type="text" id="fb-contact" required placeholder="email@example.com hoặc SĐT" 
+                               class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700/80 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-white placeholder-slate-500">
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="font-bold text-slate-300" data-i18n="form_category_label">Chủ đề liên hệ</label>
+                    <select id="fb-category" class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700/80 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-white text-base sm:text-xs">
+                        <option value="Hỗ trợ kỹ thuật vận hành" data-i18n="opt_support">Hỗ trợ vận hành & Cấu hình thiết bị</option>
+                        <option value="Báo cáo lỗi phần mềm / cảm biến" data-i18n="opt_bug">Báo cáo lỗi phần mềm / Cảm biến</option>
+                        <option value="Đóng góp ý kiến cải tiến STEM" data-i18n="opt_idea">Góp ý cải tiến & Mở rộng mô hình STEM</option>
+                        <option value="Chủ đề khác" data-i18n="opt_other">Chủ đề khác</option>
+                    </select>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="font-bold text-slate-300" data-i18n="form_msg_label">Nội dung tin nhắn</label>
+                    <textarea id="fb-message" rows="4" required placeholder="Nhập chi tiết nội dung bạn muốn gửi tới nhóm nghiên cứu..." 
+                              class="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-slate-700/80 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-white placeholder-slate-500"></textarea>
+                </div>
+
+                <button type="submit" id="fb-submit-btn" 
+                        class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold transition-all shadow-lg shadow-blue-500/20 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    <span id="fb-btn-text" data-i18n="form_submit_btn">Gửi Tin Nhắn Tới Đội Ngũ</span>
+                </button>
+            </form>
+
+            <div id="fb-alert" class="hidden p-4 rounded-2xl bg-emerald-900/40 border border-emerald-500/40 text-emerald-300 text-xs font-semibold text-center animate-fadeIn space-y-1">
+                <div class="flex items-center justify-center gap-2 text-sm font-bold text-emerald-400">
+                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                    <span>Gửi tin nhắn thành công!</span>
+                </div>
+                <p class="text-slate-300">Thông báo đã được chuyển thẳng tới Telegram của nhóm nghiên cứu. Chúng tôi sẽ phản hồi bạn trong thời gian sớm nhất!</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER (Đã bỏ THPT Nguyễn Huệ theo yêu cầu) -->
+    <footer class="mt-16 border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md py-8 text-center text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 space-y-3">
+            <p class="font-bold text-slate-300" data-i18n="footer_authors">
+                Tác giả: Lê Trọng Nam, Trần Duy Khang, Huỳnh Minh Ngọc | GVHD: Trần Thị Hồng Hạnh
+            </p>
+            <p class="text-[11px] text-slate-500">
+                © 2026 Hệ Thống Cống Ngăn Mặn Thông Minh. Mọi quyền được bảo lưu.
+            </p>
+            <div class="flex items-center justify-center gap-4 text-xs font-semibold text-blue-400 pt-1">
+                <a href="index.html" class="hover:underline">Bảng Điều Khiển</a>
+                <span>•</span>
+                <a href="album.html" class="hover:underline">Album Dự Án</a>
+                <span>•</span>
+                <a href="login.html" class="hover:underline">Đăng Nhập</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- I18N DICTIONARY & LOGIC -->
+    <script>
+        lucide.createIcons();
+
+        // 1. Dữ liệu Google Apps Script & Telegram Bot
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxuwR7fge5YmBoxpF24nEVbC4FnPTNMpKTLWE3GXZTpd-kdxmE5S4A05oaWLP65jaa6/exec";
+        const TELEGRAM_CHAT_ID = "7831605237";
+
+        // 2. Chức năng Copy Email tiện lợi
+        window.copyEmail = function(email, btn) {
+            navigator.clipboard.writeText(email).then(() => {
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>';
+                btn.classList.add('bg-emerald-950/60', 'border-emerald-500/50');
+                lucide.createIcons({root: btn});
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.classList.remove('bg-emerald-950/60', 'border-emerald-500/50');
+                    lucide.createIcons({root: btn});
+                }, 2000);
+            }).catch(() => {
+                alert('Đã sao chép: ' + email);
+            });
+        };
+
+        // 3. Từ điển đa ngôn ngữ
+        const translations = {
+            vi: {
+                brand_title: "CỐNG THÔNG MINH",
+                nav_dashboard: "Bảng Điều Khiển",
+                nav_album: "Album Kỷ Niệm",
+                nav_contact: "Liên Hệ & Hỗ Trợ",
+                btn_login: "Đăng Nhập",
+                hero_badge: "Dự Án Nghiên Cứu Khoa Học & STEM",
+                hero_title_1: "Thông Tin Liên Hệ &",
+                hero_title_2: "Hỗ Trợ Kỹ Thuật Dự Án",
+                hero_subtitle: "Đề tài: 'Hệ thống giám sát và điều khiển cống ngăn mặn thông minh ứng dụng IoT trên nền tảng vi điều khiển ESP32'. Hãy liên hệ với nhóm nghiên cứu hoặc gửi tin nhắn hỗ trợ trực tiếp bên dưới.",
+                gvhd_badge: "Giáo Viên Hướng Dẫn",
+                gvhd_name: "Cô Trần Thị Hồng Hạnh",
+                gvhd_school: "Trường THPT Nguyễn Huệ",
+                gvhd_desc: "Người chỉ đạo, hướng dẫn phương pháp nghiên cứu khoa học, bảo trợ kỹ thuật và định hướng ứng dụng thực tiễn giải pháp cống ngăn mặn tự động bảo vệ đất canh tác và nguồn nước sinh hoạt.",
+                team_section_title: "Nhóm Tác Giả Nghiên Cứu",
+                team_section_sub: "Đội ngũ phát triển & sáng lập NKN Labs",
+                role_nam: "Thiết Kế Mô Hình Cống",
+                desc_nam: "Phụ trách thiết kế và gia công mô hình cống ngăn mặn, hoàn thiện cấu trúc cửa van và kiểu dáng tổng thể của mô hình.",
+                role_khang: "Kiến Trúc Hệ Thống & Nền Tảng Số",
+                desc_khang: "Phụ trách thiết kế kiến trúc hệ thống, xây dựng nền tảng web điều khiển thời gian thực, đồng bộ dữ liệu đám mây và tối ưu hóa giải pháp vận hành tự động.",
+                role_ngoc: "Kỹ Thuật Phần Cứng & Vẽ 3D",
+                desc_ngoc: "Phụ trách thiết kế bản vẽ 3D các chi tiết, lắp ráp mạch điện, đấu nối hệ thống dây tín hiệu và các khối cảm biến vận hành.",
+                form_badge: "Hòm Thư Trực Tuyến & Telegram",
+                form_title: "Gửi Ý Kiến & Yêu Cầu Hỗ Trợ",
+                form_desc: "Tin nhắn của bạn sẽ được gửi thẳng tới điện thoại Telegram của đội ngũ phát triển ngay lập tức để được hỗ trợ giải đáp kịp thời.",
+                form_name_label: "Họ và tên của bạn",
+                form_email_label: "Email hoặc Số điện thoại",
+                form_category_label: "Chủ đề liên hệ",
+                opt_support: "Hỗ trợ vận hành & Cấu hình thiết bị",
+                opt_bug: "Báo cáo lỗi phần mềm / Cảm biến",
+                opt_idea: "Góp ý cải tiến & Mở rộng mô hình STEM",
+                opt_other: "Chủ đề khác",
+                form_msg_label: "Nội dung tin nhắn",
+                form_submit_btn: "Gửi Tin Nhắn Tới Đội Ngũ",
+                footer_authors: "Tác giả: Lê Trọng Nam, Trần Duy Khang, Huỳnh Minh Ngọc | GVHD: Trần Thị Hồng Hạnh"
+            },
+            en: {
+                brand_title: "SMART SLUICE GATE",
+                nav_dashboard: "Dashboard",
+                nav_album: "Memories Album",
+                nav_contact: "Contact & Support",
+                btn_login: "Sign In",
+                hero_badge: "Science & STEM Research Project",
+                hero_title_1: "Contact Information &",
+                hero_title_2: "Project Technical Support",
+                hero_subtitle: "Project: 'Smart Saltwater Intrusion Prevention Sluice Gate System using IoT with ESP32'. Contact our research team or submit a message below.",
+                gvhd_badge: "Project Supervisor",
+                gvhd_name: "Mrs. Tran Thi Hong Hanh",
+                gvhd_school: "Nguyen Hue High School",
+                gvhd_desc: "Directing scientific methodology, supervising engineering solutions and advising practical applications to protect agricultural land and freshwater.",
+                team_section_title: "Research & Development Team",
+                team_section_sub: "Development Team & Founders of NKN Labs",
+                role_nam: "Sluice Gate Model Design",
+                desc_nam: "Designed and manufactured the saltwater sluice gate physical prototype, structure, and overall model appearance.",
+                role_khang: "System Architecture & Digital Platform",
+                desc_khang: "Engineered smart system architecture, real-time web dashboard, cloud synchronization and autonomous operations.",
+                role_ngoc: "Hardware & 3D Modeling",
+                desc_ngoc: "Engineered 3D CAD modeling, circuitry wiring, signal cabling and sensor hardware assemblies.",
+                form_badge: "Online Mailbox & Telegram",
+                form_title: "Send Feedback & Support Request",
+                form_desc: "Your message will be transmitted directly to the development team's Telegram phone for rapid assistance.",
+                form_name_label: "Your Full Name",
+                form_email_label: "Email or Phone Number",
+                form_category_label: "Inquiry Topic",
+                opt_support: "Operation Support & Device Setup",
+                opt_bug: "Software / Sensor Bug Report",
+                opt_idea: "Improvement Feedback & STEM Expansion",
+                opt_other: "Other Inquiries",
+                form_msg_label: "Your Message",
+                form_submit_btn: "Send Message To Team",
+                footer_authors: "Authors: Le Trong Nam, Tran Duy Khang, Huynh Minh Ngoc | Supervisor: Tran Thi Hong Hanh"
+            }
+        };
+
+        let currentLang = localStorage.getItem('scada_lang') || 'vi';
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('scada_lang', lang);
+            document.documentElement.lang = lang;
+            const btnText = document.getElementById('lang-btn-text');
+            if (btnText) {
+                btnText.textContent = lang === 'vi' ? '🇻🇳 VI' : '🇬🇧 EN';
+            }
+            document.querySelectorAll('.drawer-lang-btn').forEach(el => el.textContent = lang === 'vi' ? '🇻🇳 VI' : '🇬🇧 EN');
+            const dict = translations[lang] || translations.vi;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) {
+                    el.textContent = dict[key];
+                }
+            });
+        }
+
+        window.toggleLanguage = function() {
+            const newLang = currentLang === 'vi' ? 'en' : 'vi';
+            applyLanguage(newLang);
+        };
+
+        // 4. Xử lý Gửi Ý Kiến qua Telegram Bot
+        window.handleSendFeedback = async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('fb-name').value.trim();
+            const contact = document.getElementById('fb-contact').value.trim();
+            const category = document.getElementById('fb-category').value;
+            const message = document.getElementById('fb-message').value.trim();
+
+            if (!name || !contact || !message) return;
+
+            const submitBtn = document.getElementById('fb-submit-btn');
+            const btnText = document.getElementById('fb-btn-text');
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Đang gửi tới Telegram...';
+            lucide.createIcons({root: submitBtn});
+
+            const teleMessage = 
+                "📩 [HỖ TRỢ / Ý KIẾN MỚI TỪ WEB]\n" +
+                "👤 Người gửi: " + name + "\n" +
+                "📞 Liên hệ: " + contact + "\n" +
+                "🏷️ Chủ đề: " + category + "\n" +
+                "⏰ Thời gian: " + new Date().toLocaleString('vi-VN') + "\n" +
+                "💬 Nội dung:\n" + message;
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('loai', 'broadcast_telegram');
+                formData.append('message', teleMessage);
+                formData.append('severity', 'normal');
+                formData.append('chat_id', TELEGRAM_CHAT_ID);
+                formData.append('api_key', 'NgayMaiDiThiQG2026');
+
+                fetch(GAS_URL, {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'no-cors'
+                });
+
+                try {
+                    const list = JSON.parse(localStorage.getItem('scada_feedbacks') || '[]');
+                    list.unshift({ name, contact, category, message, timestamp: new Date().toISOString() });
+                    localStorage.setItem('scada_feedbacks', JSON.stringify(list));
+                } catch(err) {}
+
+                const alertEl = document.getElementById('fb-alert');
+                alertEl.classList.remove('hidden');
+                document.getElementById('contact-form').reset();
+                lucide.createIcons({root: alertEl});
+
+                setTimeout(() => {
+                    alertEl.classList.add('hidden');
+                }, 8000);
+            } catch(err) {
+                console.error("Lỗi gửi liên hệ:", err);
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = currentLang === 'en' ? 'Send Message To Team' : 'Gửi Tin Nhắn Tới Đội Ngũ';
+                lucide.createIcons({root: submitBtn});
+            }
+        };
+
+        // 5. Kiểm tra trạng thái Đăng nhập trên Header
+        function getActiveUserAvatar() {
+            const direct = localStorage.getItem('scada_active_avatar');
+            if (direct) return direct;
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith('user_avatar_')) {
+                    const val = localStorage.getItem(k);
+                    if (val) return val;
+                }
+            }
+            try {
+                const accounts = JSON.parse(localStorage.getItem('scada_accounts') || '[]');
+                if (accounts.length > 0 && accounts[0].photoURL) {
+                    return accounts[0].photoURL;
+                }
+            } catch(e) {}
+            return localStorage.getItem('userAvatar') || '';
+        }
+
+        function checkHeaderAuth() {
+            const container = document.getElementById('header-auth-container');
+            if (!container) return;
+
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userRole = localStorage.getItem('userRole') || 'guest';
+            const isAdmin = isLoggedIn && (userRole === 'admin');
+
+            if (isLoggedIn && isAdmin) {
+                const accounts = JSON.parse(localStorage.getItem('scada_accounts') || '[]');
+                const activeAcc = accounts[0] || {};
+                const userName = activeAcc.displayName || 'Duy Khang';
+                const userAvatar = getActiveUserAvatar();
+
+                container.innerHTML = `
+                    <a href="index.html" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-white transition-all">
+                        ${userAvatar ? `<img src="${userAvatar}" class="w-5 h-5 rounded-full object-cover">` : `<div class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">DK</div>`}
+                        <span class="max-w-[90px] truncate hidden sm:inline">${userName}</span>
+                        <span class="text-[10px] text-sky-400 font-black">👑</span>
+                    </a>
+                `;
+            } else if (isLoggedIn && (userRole === 'guest' || userRole === 'viewer')) {
+                container.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300">
+                            <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span>Khách</span>
+                        </div>
+                        <a href="login.html" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md shadow-blue-500/20 active:scale-95">
+                            <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                            <span data-i18n="btn_login">Đăng Nhập</span>
+                        </a>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <a href="login.html" id="btn-header-login" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all active:scale-95">
+                        <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                        <span data-i18n="btn_login">Đăng Nhập</span>
+                    </a>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        window.toggleMobileDrawer = function(open) {
+            const backdrop = document.getElementById('mobile-drawer-backdrop');
+            const drawer = document.getElementById('mobile-drawer');
+            if (!drawer || !backdrop) return;
+            if (open) {
+                backdrop.classList.remove('hidden');
+                setTimeout(() => drawer.classList.remove('-translate-x-full'), 10);
+            } else {
+                drawer.classList.add('-translate-x-full');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+            lucide.createIcons();
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyLanguage(currentLang);
+            checkHeaderAuth();
+        });
+    </script>
+</body>
+</html>
