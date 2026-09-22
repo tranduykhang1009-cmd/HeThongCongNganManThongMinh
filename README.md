@@ -5,8 +5,8 @@
 ---
 
 ## 🏆 THÀNH TÍCH ĐẠT ĐƯỢC
-* 🥇 **GIẢI NHẤT** - Cuộc thi Sáng tạo Dành cho Thanh thiếu niên, Nhi đồng tỉnh Vĩnh Long lần thứ I (Năm học 2025 - 2026).
-* 🥇 **GIẢI NHẤT** - Ngày hội Khoa học Kỹ thuật & STEM cấp Trường - THPT Nguyễn Huệ.
+* 🥇 **GIẢI NHẤT** - Cuộc thi Sáng tạo Dành cho Thanh thiếu niên Nhi đồng tỉnh Vĩnh Long lần thứ I (Năm học 2025 - 2026).
+* 🥇 **GIẢI NHẤT** - Ngày hội STEM cấp Trường - THPT Nguyễn Huệ.
 
 ---
 
@@ -56,7 +56,7 @@ HeThongCongNganManThongMinh/
 ---
 
 ## 🛠️ CÔNG NGHỆ ÁP DỤNG
-* **Phần cứng**: ESP32-WROOM-32D (Dual-Core 240MHz, FreeRTOS), Cảm biến TDS ngâm nước, Cảm biến siêu âm chống nước JSN, Động cơ Servo kéo cửa van thẳng đứng, Mạch đo công suất INA3221, Màn hình LCD I2C, Pin năng lượng mặt trời.
+* **Phần cứng**: ESP32-WROOM-32D (Dual-Core 240MHz, FreeRTOS), Cảm biến TDS , Cảm biến siêu âm, Động cơ Servo , Mạch đo công suất INA3221, Màn hình LCD I2C, Pin năng lượng mặt trời.
 * **Giao thức & Đám mây**: Firebase Realtime Database (WebSocket), Telegram Bot API, ESP-NOW / WiFi Telemetry.
 * **Giao diện Web**: HTML5 Responsive, Tailwind CSS, Lucide Icons, Canvas Image Processing.
 
