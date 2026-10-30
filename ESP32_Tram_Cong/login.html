@@ -1,176 +1,227 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Hệ Thống Cống Ngăn Mặn - Xác Thực</title>
+    <title>Hệ Thống Cống Ngăn Mặn Thông Minh - Đăng Nhập</title>
     <link rel="icon" type="image/png" href="logo.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .form-card { transition: all 0.3s ease-in-out; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #020617;
+            overflow-x: hidden;
+        }
+
+        /* Anti-slop Chrome Autofill Fix - Keeps input dark */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #090e1a inset !important;
+            -webkit-text-fill-color: #f8fafc !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .pb-safe { padding-bottom: max(0.75rem, calc(env(safe-area-inset-bottom) + 0.5rem)) !important; }
+        .pt-safe { padding-top: max(0.75rem, env(safe-area-inset-top)) !important; }
     </style>
 </head>
 
-<body class="min-h-screen flex flex-col justify-between items-center py-4 sm:py-6 px-3 sm:px-4 bg-slate-950 text-slate-200 relative overflow-y-auto selection:bg-blue-600 selection:text-white">
+<body class="min-h-[100dvh] flex flex-col items-center justify-between px-4 py-4 sm:py-6 bg-slate-950 text-slate-100 relative overflow-y-auto selection:bg-blue-600 selection:text-white">
     
-    <!-- Background Gradients -->
-    <div class="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 pointer-events-none -z-20"></div>
-    <div class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none -z-10"></div>
-    <div class="fixed -top-40 -right-40 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <!-- Subtle ambient background light -->
+    <div class="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(37,99,235,0.15),rgba(255,255,255,0))] pointer-events-none -z-10"></div>
+    <div class="fixed inset-0 bg-slate-950/80 pointer-events-none -z-20"></div>
 
-    <!-- Top Language Switcher Bar -->
-    <div class="w-full max-w-md flex justify-end z-20 mb-2">
-        <button type="button" onclick="toggleLanguage()" class="flex items-center gap-1.5 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 rounded-full px-3 py-1 shadow-sm transition-all active:scale-95 text-slate-200 text-xs font-bold cursor-pointer">
+    <!-- Top Navigation -->
+    <header class="w-full max-w-[420px] mx-auto flex items-center justify-between py-2 z-20">
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white transition-all shadow-sm">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5 text-blue-400"></i>
+            <span>Về Bảng Điều Khiển</span>
+        </a>
+        <button type="button" onclick="toggleLanguage()" class="inline-flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-all shadow-sm cursor-pointer">
             <i data-lucide="globe" class="w-3.5 h-3.5 text-blue-400"></i>
             <span id="lang-btn-text">🇻🇳 VI</span>
         </button>
-    </div>
+    </header>
 
-    <!-- COMPACT FORM CARD -->
-    <div class="form-card relative z-10 bg-slate-900/85 backdrop-blur-2xl border border-slate-700/60 shadow-2xl rounded-3xl p-5 sm:p-7 w-full max-w-[390px] my-auto">
-        
-        <!-- Brand Header -->
-        <div class="text-center mb-4">
-            <div class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-blue-600/20 text-blue-400 mb-2 border border-blue-500/30 shadow-md shadow-blue-500/15">
-                <i data-lucide="waves" class="w-5 h-5"></i>
+    <!-- MAIN UNIFIED WRAPPER -->
+    <div class="w-full max-w-[420px] flex flex-col items-center gap-2 sm:gap-2.5 relative z-10 pt-safe pb-safe my-auto">
+
+        <!-- In-app Browser Notice for Zalo/FB -->
+        <div id="inapp-browser-banner" class="hidden w-full bg-blue-950/90 border border-blue-500/40 rounded-xl p-2.5 text-xs text-blue-200 flex items-start gap-2 shadow-xl backdrop-blur-xl">
+            <i data-lucide="info" class="w-4 h-4 text-blue-400 shrink-0 mt-0.5"></i>
+            <div class="flex-1 leading-relaxed">
+                <span>Bạn đang mở qua Zalo: Nếu nút Google không phản hồi, bấm dấu <strong>(···)</strong> góc trên chọn <strong>Mở bằng trình duyệt</strong> (Safari/Chrome).</span>
             </div>
-            <h1 class="text-[10px] font-black text-blue-400 tracking-[0.15em] uppercase" data-i18n="app_sub">Hệ thống giám sát</h1>
-            <h2 class="text-xl font-extrabold text-white tracking-tight" data-i18n="app_title">CỐNG NGĂN MẶN</h2>
-        </div>
-        
-        <!-- LOGIN FORM -->
-        <div id="login-form">
-            <form id="form-login" class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wide" data-i18n="label_username_email">Email hoặc Tên đăng nhập</label>
-                    <input type="text" id="login-email" required placeholder="name@example.com hoặc username" 
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 text-white placeholder-slate-500 border border-slate-700 focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all text-sm sm:text-xs">
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wide" data-i18n="label_password">Mật khẩu</label>
-                    <div class="relative">
-                        <input type="password" id="login-password" required placeholder="••••••••" 
-                            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 text-white placeholder-slate-500 border border-slate-700 focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-medium transition-all pr-10 text-sm sm:text-xs">
-                        <button type="button" onclick="togglePassword('login-password', 'eye-icon')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1 transition-colors cursor-pointer">
-                            <i data-lucide="eye" id="eye-icon" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between text-[11px] pt-0.5">
-                    <label class="flex items-center text-slate-300 cursor-pointer select-none">
-                        <input type="checkbox" id="remember-me" class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5 mr-1.5">
-                        <span data-i18n="remember_device">Ghi nhớ</span>
-                    </label>
-                    <button type="button" onclick="resetPassword()" class="font-bold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer" data-i18n="forgot_pass">Quên mật khẩu?</button>
-                </div>
-
-                <button type="submit" id="btn-login-submit"
-                    class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold transition-all shadow-md shadow-blue-500/25 active:scale-[0.98] text-xs flex items-center justify-center gap-1.5 cursor-pointer mt-1">
-                    <i data-lucide="log-in" class="w-4 h-4"></i>
-                    <span data-i18n="btn_login_submit">Đăng nhập</span>
-                </button>
-            </form>
-
-            <div class="relative my-3 flex items-center justify-center">
-                <div class="border-t border-slate-800 w-full"></div>
-                <span class="bg-slate-900 px-2.5 text-[10px] text-slate-500 font-bold uppercase tracking-wider relative z-10" data-i18n="divider_or">HOẶC</span>
-            </div>
-
-            <button type="button" onclick="loginWithGoogle()" class="w-full flex justify-center items-center gap-2 bg-white hover:bg-slate-100 text-slate-800 font-bold py-2 rounded-xl shadow-sm transition-all active:scale-[0.98] text-xs cursor-pointer">
-                <svg class="w-4 h-4" viewBox="0 0 48 48">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
-                </svg>
-                Google
+            <button type="button" onclick="document.getElementById('inapp-browser-banner').remove()" class="text-slate-400 hover:text-white p-0.5">
+                <i data-lucide="x" class="w-4 h-4"></i>
             </button>
-
-            <!-- Compact Guest Button -->
-            <button type="button" onclick="loginAsGuest()" class="w-full mt-2.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-blue-300 font-bold transition-all text-[11px] flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer">
-                <i data-lucide="user" class="w-3.5 h-3.5 text-blue-400"></i>
-                <span data-i18n="guest_mode_title">Tiếp tục với tư cách Khách (Không cần đăng nhập)</span>
-            </button>
-
-            <p class="text-center text-[11px] font-medium text-slate-400 mt-3">
-                Chưa có tài khoản? 
-                <button type="button" onclick="toggleForm('register')" class="font-bold text-blue-400 underline hover:text-blue-300 transition-colors ml-1 cursor-pointer">Đăng ký ngay</button>
-            </p>
         </div>
 
-        <!-- REGISTER FORM -->
-        <div id="register-form" class="hidden">
-            <form id="form-register" class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wide">Tên hiển thị / Username</label>
-                    <input type="text" id="reg-username" required placeholder="admin_scada" 
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 text-white placeholder-slate-500 border border-slate-700 focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium transition-all text-sm sm:text-xs">
+        <!-- REFINED LOGIN CARD -->
+        <div id="login-card" class="relative w-full bg-slate-900/90 border border-slate-800 shadow-2xl rounded-2xl sm:rounded-3xl p-5 sm:p-7 backdrop-blur-md">
+            
+            <!-- Brand Header -->
+            <div class="text-center mb-4 sm:mb-5 relative z-10">
+                <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-md mx-auto mb-2.5 border border-blue-500/40">
+                    <i data-lucide="waves" class="w-6 h-6"></i>
                 </div>
                 
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wide">Email</label>
-                    <input type="email" id="reg-email" required placeholder="admin@scada.vn" 
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 text-white placeholder-slate-500 border border-slate-700 focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium transition-all text-sm sm:text-xs">
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wide">Mật khẩu</label>
-                    <div class="relative">
-                        <input type="password" id="reg-password" required placeholder="••••••••" 
-                            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 text-white placeholder-slate-500 border border-slate-700 focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium transition-all pr-10 text-sm sm:text-xs">
-                        <button type="button" onclick="togglePassword('reg-password', 'eye-icon-2')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1 transition-colors cursor-pointer">
-                            <i data-lucide="eye" id="eye-icon-2" class="w-4 h-4"></i>
-                        </button>
+                <h1 class="text-xs font-extrabold text-blue-400 tracking-wider uppercase mb-1" data-i18n="app_sub">HỆ THỐNG ĐIỀU KHIỂN & GIÁM SÁT IOT</h1>
+                <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight" data-i18n="app_title">CỐNG NGĂN MẶN THÔNG MINH</h2>
+                <div class="w-10 h-0.5 bg-blue-500/50 rounded-full mx-auto mt-2"></div>
+            </div>
+            
+            <!-- LOGIN FORM -->
+            <div id="login-form" class="relative z-10">
+                <form id="form-login" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5 tracking-wide" data-i18n="label_username_email">Email hoặc Tên đăng nhập</label>
+                        <div class="relative">
+                            <input type="text" id="login-email" required placeholder="name@example.com hoặc username" 
+                                class="w-full h-11 px-3.5 rounded-xl bg-slate-950 text-white placeholder-slate-500 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 font-medium transition-all text-xs sm:text-sm">
+                        </div>
                     </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5 tracking-wide" data-i18n="label_password">Mật khẩu</label>
+                        <div class="relative">
+                            <input type="password" id="login-password" required placeholder="••••••••" 
+                                class="w-full h-11 px-3.5 rounded-xl bg-slate-950 text-white placeholder-slate-500 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 font-medium transition-all pr-11 text-xs sm:text-sm">
+                            <button type="button" onclick="togglePassword('login-password', 'eye-icon')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1.5 transition-colors cursor-pointer z-10">
+                                <i data-lucide="eye" id="eye-icon" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs pt-0.5">
+                        <label class="flex items-center text-slate-300 cursor-pointer select-none text-xs">
+                            <input type="checkbox" id="remember-me" class="rounded bg-slate-950 border-slate-700 text-blue-500 focus:ring-blue-500 w-3.5 h-3.5 mr-1.5">
+                            <span data-i18n="remember_device">Ghi nhớ</span>
+                        </label>
+                        <button type="button" onclick="resetPassword()" class="font-semibold text-blue-400 hover:text-blue-300 transition-colors cursor-pointer text-xs" data-i18n="forgot_pass">Quên mật khẩu?</button>
+                    </div>
+
+                    <button type="submit" id="btn-login-submit"
+                        class="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold transition-all shadow-sm active:scale-[0.99] text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer mt-3">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span data-i18n="btn_login_submit">Đăng nhập</span>
+                    </button>
+                </form>
+
+                <div class="relative my-3 flex items-center justify-center">
+                    <div class="border-t border-slate-800 w-full"></div>
+                    <span class="bg-slate-900 px-3 text-xs text-slate-400 font-bold uppercase tracking-wider relative z-10" data-i18n="divider_or">HOẶC</span>
                 </div>
 
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1 uppercase tracking-wide">Xác nhận mật khẩu</label>
-                    <input type="password" id="reg-confirm-password" required placeholder="••••••••" 
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 text-white placeholder-slate-500 border border-slate-700 focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium transition-all text-sm sm:text-xs">
-                </div>
-
-                <button type="submit" id="btn-reg-submit"
-                    class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold transition-all shadow-md shadow-blue-500/25 active:scale-[0.98] text-xs flex items-center justify-center gap-1.5 cursor-pointer mt-1">
-                    <i data-lucide="user-plus" class="w-4 h-4"></i> Tạo tài khoản
+                <!-- Google Button (Sleek Dark Slate Style) -->
+                <button type="button" onclick="loginWithGoogle()" id="btn-google-login" class="w-full h-11 flex justify-center items-center gap-2.5 bg-slate-950 hover:bg-slate-800/80 text-slate-100 font-semibold rounded-xl border border-slate-800 hover:border-slate-700 shadow-sm transition-all active:scale-[0.99] text-xs sm:text-sm cursor-pointer">
+                    <svg class="w-4 h-4" viewBox="0 0 48 48">
+                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                    </svg>
+                    <span>Đăng nhập với Google</span>
                 </button>
 
-                <p class="text-center text-[11px] font-medium text-slate-400 mt-3">
-                    Đã có tài khoản? 
-                    <button type="button" onclick="toggleForm('login')" class="font-bold text-blue-400 underline hover:text-blue-300 transition-colors ml-1 cursor-pointer">Đăng nhập</button>
+                <!-- Guest Button -->
+                <button type="button" onclick="loginAsGuest()" class="w-full mt-2.5 h-10 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 text-slate-300 hover:text-white font-medium transition-all text-xs flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer">
+                    <i data-lucide="user-check" class="w-4 h-4 text-slate-400"></i>
+                    <span data-i18n="guest_mode_title">Tiếp tục với tư cách Khách (Chỉ xem)</span>
+                </button>
+
+                <p class="text-center text-xs font-medium text-slate-400 mt-3">
+                    Chưa có tài khoản? 
+                    <button type="button" onclick="toggleForm('register')" class="font-semibold text-blue-400 hover:text-blue-300 transition-colors ml-1 cursor-pointer">Đăng ký ngay</button>
                 </p>
-            </form>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="register-form" class="hidden relative z-10">
+                <form id="form-register" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5 tracking-wide">Tên hiển thị / Username</label>
+                        <input type="text" id="reg-username" required placeholder="admin_user" 
+                            class="w-full h-11 px-3.5 rounded-xl bg-slate-950 text-white placeholder-slate-500 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 font-medium transition-all text-xs sm:text-sm">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5 tracking-wide">Email</label>
+                        <input type="email" id="reg-email" required placeholder="admin@example.com" 
+                            class="w-full h-11 px-3.5 rounded-xl bg-slate-950 text-white placeholder-slate-500 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 font-medium transition-all text-xs sm:text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5 tracking-wide">Mật khẩu</label>
+                        <div class="relative">
+                            <input type="password" id="reg-password" required placeholder="••••••••" 
+                                class="w-full h-11 px-3.5 rounded-xl bg-slate-950 text-white placeholder-slate-500 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 font-medium transition-all pr-11 text-xs sm:text-sm">
+                            <button type="button" onclick="togglePassword('reg-password', 'eye-icon-2')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1.5 transition-colors cursor-pointer z-10">
+                                <i data-lucide="eye" id="eye-icon-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5 tracking-wide">Xác nhận mật khẩu</label>
+                        <input type="password" id="reg-confirm-password" required placeholder="••••••••" 
+                            class="w-full h-11 px-3.5 rounded-xl bg-slate-950 text-white placeholder-slate-500 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 font-medium transition-all text-xs sm:text-sm">
+                    </div>
+
+                    <button type="submit" id="btn-reg-submit"
+                        class="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold transition-all shadow-sm active:scale-[0.99] text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer mt-3">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i> Tạo tài khoản
+                    </button>
+
+                    <p class="text-center text-xs font-medium text-slate-400 mt-3">
+                        Đã có tài khoản? 
+                        <button type="button" onclick="toggleForm('login')" class="font-semibold text-blue-400 hover:text-blue-300 transition-colors ml-1 cursor-pointer">Đăng nhập</button>
+                    </p>
+                </form>
+            </div>
+
         </div>
 
     </div>
 
-    <!-- FOOTER (Fit on laptop & phone without overlapping) -->
-    <footer class="w-full text-center z-20 px-2 pt-3 pb-1 shrink-0 space-y-2">
-        <p class="text-slate-300 text-xs font-semibold drop-shadow-sm" id="footer-authors" data-i18n="footer_authors">
+    <!-- FOOTER -->
+    <footer class="w-full max-w-[420px] text-center space-y-2.5 py-4 z-20">
+        <p class="text-slate-400 text-xs font-normal leading-relaxed" id="footer-authors" data-i18n="footer_authors">
             Tác giả: Lê Trọng Nam, Trần Duy Khang, Huỳnh Minh Ngọc | GVHD: Trần Thị Hồng Hạnh
         </p>
         <div class="flex flex-wrap items-center justify-center gap-2">
-            <a href="contact.html" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-950/60 hover:bg-blue-900/80 border border-blue-500/30 text-blue-300 hover:text-white text-[11px] font-bold transition-all shadow-sm active:scale-95">
+            <a href="contact.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition-all shadow-sm">
                 <i data-lucide="mail" class="w-3.5 h-3.5 text-blue-400"></i>
-                <span data-i18n="btn_contact">Thông tin liên hệ & Hỗ trợ</span>
+                <span data-i18n="btn_contact">Liên Hệ & Hỗ Trợ</span>
             </a>
-            <a href="album.html" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/60 hover:bg-purple-900/80 border border-purple-500/30 text-purple-300 hover:text-white text-[11px] font-bold transition-all shadow-sm active:scale-95">
-                <i data-lucide="images" class="w-3.5 h-3.5 text-purple-400"></i>
+            <a href="album.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold transition-all shadow-sm">
+                <i data-lucide="images" class="w-3.5 h-3.5 text-sky-400"></i>
                 <span data-i18n="btn_album">Album Kỷ Niệm Dự Án</span>
             </a>
         </div>
     </footer>
 
-    <!-- FIREBASE AUTH SCRIPT -->
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signInAnonymously, updateProfile } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signInAnonymously, updateProfile } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
         import { getDatabase, ref, set, get, child, update } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -187,14 +238,122 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
         const db = getDatabase(app);
 
         lucide.createIcons();
 
+        
+        async function logLoginToGAS(action, details, method, role, name, email, uid) {
+            const GAS_URL = "https://script.google.com/macros/s/AKfycbxuwR7fge5YmBoxpF24nEVbC4FnPTNMpKTLWE3GXZTpd-kdxmE5S4A05oaWLP65jaa6/exec";
+            let ip = "N/A";
+            try {
+                const ipRes = await fetch("https://api.ipify.org?format=json");
+                const ipData = await ipRes.json();
+                ip = ipData.ip || "N/A";
+            } catch(e) {}
+            
+            let device = "Web Browser";
+            const ua = navigator.userAgent;
+            if (/Windows/i.test(ua)) device = "Windows";
+            else if (/Mac/i.test(ua)) device = "MacOS";
+            else if (/Android/i.test(ua)) device = "Android";
+            else if (/iPhone|iPad/i.test(ua)) device = "iOS";
+            if (/coc_coc_browser/i.test(ua)) device += " - Cốc Cốc";
+            else if (/Edg\//i.test(ua)) device += " - Edge";
+            else if (/Chrome/i.test(ua)) device += " - Chrome";
+            else if (/Safari/i.test(ua)) device += " - Safari";
+            else if (/Firefox/i.test(ua)) device += " - Firefox";
+
+            try {
+                await fetch(GAS_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        loai: "lich_su_dang_nhap",
+                        action: action,
+                        details: details,
+                        method: method,
+                        role: role,
+                        name: name,
+                        email: email,
+                        uid: uid || "N/A",
+                        ip: ip,
+                        device: device
+                    }),
+                    mode: "no-cors"
+                });
+            } catch(e) {
+                console.warn("[GAS Log] Error:", e);
+            }
+        }
+
+        async function checkWhitelistAndPromote(user) {
+            if (!user) return false;
+            try {
+                const userEmail = (user.email || "").toLowerCase().trim();
+                const userName = (user.displayName || "").toLowerCase().trim();
+                if (!userEmail && !userName) return false;
+
+                const wlSnap = await get(ref(db, 'admin_whitelist'));
+                if (wlSnap.exists()) {
+                    const wlData = wlSnap.val();
+                    for (const key in wlData) {
+                        const target = (wlData[key].emailOrUser || "").toLowerCase().trim();
+                        if (target && (target === userEmail || target === userName)) {
+                            console.log("Tìm thấy trong Admin Whitelist! Tự động nâng cấp quyền Admin...", user.uid);
+                            await set(ref(db, `admins/${user.uid}`), true);
+                            await update(ref(db, `web_users/${user.uid}`), {
+                                role: 'admin',
+                                isAdmin: true
+                            }).catch(console.warn);
+                            return true;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Lỗi kiểm tra admin whitelist:", err);
+            }
+            return false;
+        }
+
+
+        // Kiểm tra xem có đang mở trong In-App Browser (Zalo, FB) không
+        const isZaloOrFB = /Zalo|FBAN|FBAV|Instagram|Line|TikTok/i.test(navigator.userAgent);
+        if (isZaloOrFB) {
+            const banner = document.getElementById('inapp-browser-banner');
+            if (banner) banner.classList.remove('hidden');
+        }
+
+        // Tự động xử lý kết quả đăng nhập khi Redirect quay về trang
+        getRedirectResult(auth).then(async (result) => {
+            if (result && result.user) {
+                const user = result.user;
+                await update(ref(db, `web_users/${user.uid}`), {
+                    email: user.email || "Khách",
+                    displayName: user.displayName || "Google User",
+                    loginType: "google",
+                    lastLogin: new Date().toISOString()
+                }).catch(console.error);
+
+                let isAdm = await checkWhitelistAndPromote(user);
+                const adminSnap = await get(child(ref(db), `admins/${user.uid}`));
+                if (adminSnap.exists() && (adminSnap.val() === true || adminSnap.val() === 'true')) isAdm = true;
+
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userRole', isAdm ? 'admin' : 'viewer');
+                if (user.photoURL) localStorage.setItem('scada_active_avatar', user.photoURL);
+                await logLoginToGAS("Đăng nhập thành công", "Đăng nhập Google (Redirect)", "Google", isAdm ? "Admin" : "User", user.displayName || user.email, user.email, user.uid);
+                window.location.href = 'index.html';
+            }
+        }).catch((err) => {
+            console.warn("Lỗi redirect result:", err);
+        });
+
         // Dictionary i18n
         const loginI18n = {
             vi: {
-                app_sub: "Hệ thống giám sát",
+                app_sub: "HỆ THỐNG GIÁM SÁT",
                 app_title: "CỐNG NGĂN MẶN",
                 label_username_email: "Email hoặc Tên đăng nhập",
                 label_password: "Mật khẩu",
@@ -208,7 +367,7 @@
                 btn_album: "Album Kỷ Niệm Dự Án"
             },
             en: {
-                app_sub: "Monitoring System",
+                app_sub: "MONITORING SYSTEM",
                 app_title: "SMART SLUICE GATE",
                 label_username_email: "Email or Username",
                 label_password: "Password",
@@ -271,7 +430,21 @@
 
         // --- Auth handlers ---
         window.loginWithGoogle = async function() {
+            const btnGoogle = document.getElementById('btn-google-login');
+            if (btnGoogle) {
+                btnGoogle.disabled = true;
+                btnGoogle.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-500"></i> Đang kết nối...';
+                lucide.createIcons();
+            }
+
             try {
+                // Nếu đang trong In-App Browser (Zalo, FB), dùng Redirect an toàn
+                if (isZaloOrFB) {
+                    await signInWithRedirect(auth, provider);
+                    return;
+                }
+
+                // Trên Chrome / Safari bình thường, dùng Popup
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 await update(ref(db, `web_users/${user.uid}`), {
@@ -281,12 +454,35 @@
                     lastLogin: new Date().toISOString()
                 }).catch(console.error);
 
+                let isAdm = await checkWhitelistAndPromote(user);
+                const adminSnap = await get(child(ref(db), `admins/${user.uid}`));
+                if (adminSnap.exists() && (adminSnap.val() === true || adminSnap.val() === 'true')) isAdm = true;
+
                 localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userRole', 'admin');
+                localStorage.setItem('userRole', isAdm ? 'admin' : 'viewer');
                 if (user.photoURL) localStorage.setItem('scada_active_avatar', user.photoURL);
+                await logLoginToGAS("Đăng nhập thành công", "Đăng nhập Google (Popup)", "Google", isAdm ? "Admin" : "User", user.displayName || user.email, user.email, user.uid);
                 window.location.href = 'index.html';
             } catch (error) {
-                alert("Lỗi đăng nhập Google: " + error.message);
+                // Nếu bị chặn Popup (Zalo / Safari chặn), chuyển mượt sang Redirect mà KHÔNG hiện popup lỗi
+                if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+                    console.log("Popup không khả dụng, tự động chuyển sang chế độ Redirect...");
+                    try {
+                        await signInWithRedirect(auth, provider);
+                        return;
+                    } catch(e) {
+                        console.warn(e);
+                    }
+                }
+                
+                // Trả lại trạng thái ban đầu nếu lỗi khác
+                if (btnGoogle) {
+                    btnGoogle.disabled = false;
+                    btnGoogle.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg> <span>Google</span>';
+                }
+                if (error.code !== 'auth/popup-closed-by-user') {
+                    alert("Lưu ý đăng nhập Google: " + error.message);
+                }
             }
         };
 
@@ -307,6 +503,7 @@
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userRole', 'guest');
                 localStorage.removeItem('scada_active_avatar');
+                await logLoginToGAS("Đăng nhập thành công", "Đăng nhập chế độ khách ẩn danh", "Khách ẩn danh", "Guest", "Khách vãng lai", "guest@scada.local", "guest");
                 window.location.href = 'index.html';
             } catch (error) {
                 alert("Lỗi đăng nhập Khách: " + error.message);
@@ -337,8 +534,9 @@
 
                 // Check Admin
                 let role = 'viewer';
+                let isWl = await checkWhitelistAndPromote(user);
                 const adminSnap = await get(child(ref(db), `admins/${user.uid}`));
-                if (adminSnap.exists() && (adminSnap.val() === true || adminSnap.val() === 'true')) {
+                if (isWl || (adminSnap.exists() && (adminSnap.val() === true || adminSnap.val() === 'true'))) {
                     role = 'admin';
                 }
 
@@ -346,6 +544,7 @@
                 localStorage.setItem('userRole', role);
                 if (user.photoURL) localStorage.setItem('scada_active_avatar', user.photoURL);
 
+                await logLoginToGAS("Đăng nhập thành công", "Đăng nhập hệ thống cống thông minh", "Email/Mật khẩu", role === 'admin' ? "Admin" : "User", user.displayName || user.email, user.email, user.uid);
                 window.location.href = 'index.html';
             } catch (err) {
                 alert("Đăng nhập thất bại: " + err.message);
@@ -362,6 +561,7 @@
             const pass = document.getElementById('reg-password').value;
             const confirmPass = document.getElementById('reg-confirm-password').value;
             const btn = document.getElementById('btn-reg-submit');
+            const origHtml = btn.innerHTML;
 
             if (pass !== confirmPass) {
                 alert("Mật khẩu xác nhận không khớp!");
@@ -369,24 +569,51 @@
             }
 
             btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Đang tạo...';
+            if (window.lucide) window.lucide.createIcons();
+
             try {
                 const userCred = await createUserWithEmailAndPassword(auth, email, pass);
                 const user = userCred.user;
-                await updateProfile(user, { displayName: username });
+                await updateProfile(user, { displayName: username }).catch(console.warn);
                 await update(ref(db, `web_users/${user.uid}`), {
                     email: email,
                     displayName: username,
                     createdAt: new Date().toISOString()
-                });
-                await set(ref(db, `usernames/${username.toLowerCase()}`), email);
+                }).catch(console.warn);
+                if (username) {
+                    await set(ref(db, `usernames/${username.toLowerCase()}`), email).catch(console.warn);
+                }
 
-                alert("Tạo tài khoản thành công! Đang chuyển hướng...");
+                // Tự động kiểm tra danh sách chờ Admin (Whitelist)
+                let isAdm = await checkWhitelistAndPromote(user);
+                const adminSnap = await get(child(ref(db), `admins/${user.uid}`)).catch(() => ({ exists: () => false }));
+                if (adminSnap && adminSnap.exists() && (adminSnap.val() === true || adminSnap.val() === 'true')) {
+                    isAdm = true;
+                }
+
                 localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userRole', 'viewer');
+                localStorage.setItem('userRole', isAdm ? 'admin' : 'viewer');
+                
+                await logLoginToGAS("Đăng ký tài khoản", "Đăng ký tài khoản mới thành công", "Email/Mật khẩu", "User", username, email, user.uid);
+                alert("Tạo tài khoản thành công! Đang chuyển hướng...");
                 window.location.href = 'index.html';
             } catch (err) {
-                alert("Đăng ký thất bại: " + err.message);
+                if (err.code === 'auth/email-already-in-use') {
+                    alert("Tài khoản của bạn đã được tạo thành công trên hệ thống rồi! Hệ thống sẽ tự động chuyển sang mục Đăng nhập.");
+                    if (typeof window.toggleForm === 'function') {
+                        window.toggleForm('login');
+                    }
+                    const uInput = document.getElementById('login-username');
+                    if (uInput) uInput.value = email;
+                    const pInput = document.getElementById('login-password');
+                    if (pInput) pInput.value = pass;
+                } else {
+                    alert("Đăng ký thất bại: " + err.message);
+                }
                 btn.disabled = false;
+                btn.innerHTML = origHtml;
+                if (window.lucide) window.lucide.createIcons();
             }
         });
 

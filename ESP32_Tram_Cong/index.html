@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <script type="module">
@@ -38,6 +38,10 @@
         window.isScadaAdmin = false;
 
         window.setControlAccess = function(allow) {
+            const mobAdmin1 = document.getElementById("mob-btn-admin-dashboard");
+            const mobAdmin2 = document.getElementById("mob-account-admin-btn");
+            if (mobAdmin1) { if(allow) mobAdmin1.classList.remove("hidden"); else mobAdmin1.classList.add("hidden"); }
+            if (mobAdmin2) { if(allow) mobAdmin2.classList.remove("hidden"); else mobAdmin2.classList.add("hidden"); }
             window.isScadaAdmin = !!allow;
             const controlElements = document.querySelectorAll('.scada-control-btn');
             controlElements.forEach(el => {
@@ -1059,6 +1063,10 @@
                         if (btnAdmin) btnAdmin.classList.remove("hidden");
                         const btnAdminDash2 = document.getElementById("btn-admin-dashboard");
                         if (btnAdminDash2) btnAdminDash2.classList.remove("hidden");
+                        const mobAdmin1 = document.getElementById("mob-btn-admin-dashboard");
+                        const mobAdmin2 = document.getElementById("mob-account-admin-btn");
+                        if (mobAdmin1) mobAdmin1.classList.remove("hidden");
+                        if (mobAdmin2) mobAdmin2.classList.remove("hidden");
                     } else {
                         const roleTitle = 'Người xem (Viewer)';
                         if (roleEl) roleEl.innerText = roleTitle;
@@ -1070,6 +1078,10 @@
                         if (btnAdmin) btnAdmin.classList.add("hidden");
                         const btnAdminDash2 = document.getElementById("btn-admin-dashboard");
                         if (btnAdminDash2) btnAdminDash2.classList.add("hidden");
+                        const mobAdmin1 = document.getElementById("mob-btn-admin-dashboard");
+                        const mobAdmin2 = document.getElementById("mob-account-admin-btn");
+                        if (mobAdmin1) mobAdmin1.classList.add("hidden");
+                        if (mobAdmin2) mobAdmin2.classList.add("hidden");
                     }
                 } catch (err) {
                     console.error("Lỗi kiểm tra quyền Admin từ Database:", err);
@@ -1453,6 +1465,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="js/sonner.js"></script>
 
     
 <style>
@@ -1590,7 +1604,7 @@
                     </div>
                     <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
-                <button onclick="switchTab('tab-monitor'); toggleMobileSidebar(false); setTimeout(()=>document.getElementById('realtimeChart').scrollIntoView({behavior:'smooth', block:'center'}), 300);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
+                <button onclick="scrollToCharts();" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
                     <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
                         <i data-lucide="line-chart" class="w-4 h-4 text-blue-500"></i> Biểu Đồ
                     </div>
@@ -1693,7 +1707,15 @@
                       </div>
                       <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
                   </button>
-                  <button onclick="switchTab('tab-settings'); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
+                  
+                <!-- QUẢN LÝ NGƯỜI DÙNG (DÀNH CHO ADMIN) -->
+                <button id="mob-btn-admin-dashboard" onclick="openAdminModal(); toggleMobileSidebar(false);" class="hidden flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full border-t border-slate-100 dark:border-slate-700/50">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                        <i data-lucide="users" class="w-4 h-4"></i> Quản Lý Người Dùng
+                    </div>
+                    <span class="text-[9px] bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 font-black px-1.5 py-0.5 rounded">ADMIN</span>
+                </button>
+                <button onclick="switchTab('tab-settings'); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
                     <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
                         <i data-lucide="settings-2" class="w-4 h-4 text-slate-500"></i> Cài Đặt Hệ Thống
                     </div>
@@ -1736,6 +1758,16 @@
     <div class="p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex-shrink-0">
         <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 pl-1">Tài Khoản</h4>
         <div class="flex flex-col gap-2.5">
+            
+            <button id="mob-account-admin-btn" onclick="openAdminModal(); toggleMobileSidebar(false);" class="hidden w-full p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50 dark:bg-indigo-900/20 text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 transition-colors flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    </div>
+                    Quản Lý Người Dùng
+                </div>
+                <span class="text-[9px] bg-indigo-600 text-white font-black px-1.5 py-0.5 rounded">ADMIN</span>
+            </button>
             <button onclick="openProfileModal(); toggleMobileSidebar(false);" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 transition-colors flex items-center gap-2">
                 <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                     <i data-lucide="user" class="w-3.5 h-3.5"></i>
@@ -1756,7 +1788,7 @@
         
         <!-- LOGO & TIÊU ĐỀ HỆ THỐNG -->
         <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 min-w-0 max-w-[40%] lg:max-w-[50%]">
-            <img src="logo (2).png" alt="Logo SCADA" class="w-8 h-8 md:w-12 md:h-12 lg:w-14 lg:h-14 object-contain rounded-full bg-white p-0.5 border border-slate-200 dark:border-slate-700 flex-shrink-0 shadow-sm">
+            <img src="logo (2).png" alt="Logo Cống Thông Minh" class="w-8 h-8 md:w-12 md:h-12 lg:w-14 lg:h-14 object-contain rounded-full bg-white p-0.5 border border-slate-200 dark:border-slate-700 flex-shrink-0 shadow-sm">
             <div class="truncate leading-tight">
                 <h1 class="font-black text-xs sm:text-sm md:text-lg lg:text-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent tracking-tight uppercase leading-tight flex items-center gap-1 truncate" id="txt-app-title" data-i18n="app_title">
                     HỆ THỐNG GIÁM SÁT & ĐIỀU KHIỂN CỐNG NGĂN MẶN
@@ -1864,87 +1896,47 @@
                     </div>
                     <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 mr-1 hidden sm:inline"></i>
                 </button>
-
-                
-
-                <!-- POPOVER CHUYỂN TÀI KHOẢN (GOOGLE POPOVER STYLE - GẮN NGAY DƯỚI AVATAR) -->
-                <div id="popover-switch-account" class="hidden absolute top-12 right-0 w-80 bg-[#202124] text-gray-200 rounded-[28px] shadow-2xl border border-gray-700/60 p-5 z-50 animate-fadeIn flex flex-col items-center text-center">
-                    <!-- Close Button -->
-                    <button onclick="togglePopoverSwitchAccount(false)" class="absolute top-3 right-3 text-gray-400 hover:text-white p-1.5 rounded-full hover:bg-gray-800 transition-colors">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-
-                    <!-- Google Logo & Title Header -->
-                    <div class="flex items-center gap-2 mb-3">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                        </svg>
-                        <span class="text-xs font-bold tracking-wide text-gray-300">Tài khoản Google</span>
-                    </div>
-
-                    <!-- Centered Avatar with Google 4-Color Border -->
-                    <div class="relative my-1">
-                        <div class="p-1 rounded-full bg-gradient-to-r from-[#4285F4] via-[#EA4335] via-[#FBBC05] to-[#34A853] shadow-[0_0_15px_rgba(66,133,244,0.4)]">
-                            <div id="switch-account-main-avatar" class="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-xl flex items-center justify-center overflow-hidden border-2 border-[#202124]">DK</div>
-                        </div>
-                    </div>
-
-                    <!-- User Info Header -->
-                    <div id="switch-account-main-name" class="text-sm font-black text-white mt-1 truncate max-w-full">--</div>
-                    <div id="switch-account-main-email" class="text-[11px] text-gray-400 font-medium mb-3 truncate max-w-full">--</div>
-
-                    <!-- Account Selection List Container -->
-                    <div class="w-full border-t border-gray-700/60 pt-2.5 text-left">
-                        <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1 px-1">Danh sách tài khoản</div>
-                        <div id="switch-account-list" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                            <!-- Rendered accounts -->
-                        </div>
-                    </div>
-
-                    <!-- Add Other Account Button -->
-                    <!-- Removed add account button -->
-                </div>
+            </div>
             </div>
         </div>
     </div>
 
-    <!-- Thanh Chuyển Tab Compact (6 Tab Độc Lập) -->
-    <div id="nav-tabs-container" class="w-full px-2 sm:px-4 md:px-8 flex gap-1 sm:gap-3 md:gap-5 border-t border-slate-100 dark:border-slate-700/50 pt-0.5 pb-0.5 overflow-x-auto overflow-y-hidden whitespace-nowrap hide-scrollbar touch-pan-x cursor-grab ios-touch-scroll no-scrollbar">
-        <button onclick="switchTab('tab-monitor')" id="nav-monitor" class="pb-1.5 px-1 text-xs sm:text-sm font-bold text-blue-600 border-b-2 border-blue-600 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+    <!-- Thanh Chuyển Tab (8 Tab Độc Lập) -->
+    <div id="nav-tabs-container" class="w-full px-2 sm:px-4 md:px-8 flex gap-1 sm:gap-2 md:gap-3 border-t border-slate-100 dark:border-slate-700/50 pt-1 pb-1 overflow-x-auto overflow-y-hidden whitespace-nowrap hide-scrollbar touch-pan-x cursor-grab ios-touch-scroll no-scrollbar">
+        <button onclick="switchTab('tab-monitor')" id="nav-monitor" class="py-2 px-3 sm:px-3.5 text-sm font-bold text-blue-600 border-b-2 border-blue-600 flex items-center gap-2 whitespace-nowrap flex-shrink-0 btn-press">
             <i data-lucide="layout-grid" class="w-4 h-4"></i> <span data-i18n="tab_monitor">Giám Sát Realtime</span>
         </button>
-        <button onclick="switchTab('tab-control')" id="nav-control" class="pb-1.5 px-1 text-xs sm:text-sm font-bold text-slate-400 dark:text-slate-500 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+        <button onclick="switchTab('tab-forecast')" id="nav-forecast" class="py-2 px-3 sm:px-3.5 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap flex-shrink-0 transition-colors btn-press">
+            <i data-lucide="trending-up" class="w-4 h-4 text-blue-500"></i> <span>Dự Báo & Phân Tích</span>
+        </button>
+        <button onclick="switchTab('tab-control')" id="nav-control" class="py-2 px-3 sm:px-3.5 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap flex-shrink-0 btn-press">
             <i data-lucide="gamepad-2" class="w-4 h-4"></i> <span data-i18n="tab_control">Điều Khiển & Camera</span>
         </button>
-        <button onclick="switchTab('tab-settings')" id="nav-settings" class="pb-1.5 px-1 text-xs sm:text-sm font-bold text-slate-400 dark:text-slate-500 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+        <button onclick="switchTab('tab-settings')" id="nav-settings" class="py-2 px-3 sm:px-3.5 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap flex-shrink-0 btn-press">
             <i data-lucide="settings-2" class="w-4 h-4"></i> <span data-i18n="tab_settings">Cài Đặt Hệ Thống</span>
         </button>
-        <button onclick="switchTab('tab-canh-bao')" id="nav-canh-bao" class="pb-1.5 px-1 text-xs sm:text-sm font-bold text-slate-400 dark:text-slate-500 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+        <button onclick="switchTab('tab-canh-bao')" id="nav-canh-bao" class="py-2 px-3 sm:px-3.5 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap flex-shrink-0 btn-press">
             <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i> 
             <span data-i18n="tab_canh_bao">Cảnh Báo Sự Cố</span>
             <span id="alert-log-count-badge" class="hidden ml-1 px-1.5 py-0.5 text-[10px] bg-red-500 text-white font-black rounded-full leading-none shadow-sm animate-pulse">0</span>
         </button>
-        <button onclick="switchTab('tab-thao-tac')" id="nav-thao-tac" class="pb-1.5 px-1 text-xs sm:text-sm font-bold text-slate-400 dark:text-slate-500 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+        <button onclick="switchTab('tab-thao-tac')" id="nav-thao-tac" class="py-2 px-3 sm:px-3.5 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap flex-shrink-0 btn-press">
             <i data-lucide="history" class="w-4 h-4 text-blue-500"></i> 
             <span data-i18n="tab_thao_tac">Lịch Sử Thao Tác</span>
             <span id="action-log-count-badge" class="hidden ml-1 px-1.5 py-0.5 text-[10px] bg-blue-600 text-white font-black rounded-full leading-none shadow-sm">0</span>
         </button>
-        <button onclick="switchTab('tab-phat-thanh')" id="nav-phat-thanh" class="pb-1.5 px-1 text-xs sm:text-sm font-bold text-slate-400 dark:text-slate-500 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+        <button onclick="switchTab('tab-phat-thanh')" id="nav-phat-thanh" class="py-2 px-3 sm:px-3.5 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap flex-shrink-0 btn-press">
             <i data-lucide="mic" class="w-4 h-4 text-emerald-500"></i> 
             <span data-i18n="tab_phat_thanh">Phát Thanh Loa</span>
         </button>
-
-        <button onclick="switchTab('tab-bao-tri')" id="nav-bao-tri" class="pb-1.5 px-1 text-xs sm:text-sm font-bold text-slate-400 dark:text-slate-500 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+        <button onclick="switchTab('tab-bao-tri')" id="nav-bao-tri" class="py-2 px-3 sm:px-3.5 text-sm font-bold text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-2 whitespace-nowrap flex-shrink-0 btn-press">
             <i data-lucide="wrench" class="w-4 h-4 text-amber-500"></i> 
             <span data-i18n="tab_bao_tri">Bảo Trì Thiết Bị</span>
         </button>
         <!-- Button Công Cụ -->
-        <button onclick="toggleToolsMenu()" id="nav-tools" class="pb-1.5 px-2 text-xs sm:text-sm font-bold border-b-2 border-transparent hover:border-slate-400 flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 text-slate-500 transition-colors relative">
+        <button onclick="toggleToolsMenu()" id="nav-tools" class="py-2 px-3 text-sm font-bold border-b-2 border-transparent hover:border-slate-400 flex items-center gap-2 whitespace-nowrap flex-shrink-0 text-slate-500 transition-colors relative btn-press">
             <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i> 
-            <span>CÔNG CỤ <i data-lucide="chevron-down" class="w-3 h-3 inline"></i></span>
+            <span>CÔNG CỤ <i data-lucide="chevron-down" class="w-3.5 h-3.5 inline"></i></span>
         </button>
     </div>
 </header>
@@ -2046,6 +2038,17 @@
                     <div class="flex items-baseline gap-1.5 my-1">
                         <span class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight" id="val-salinity">--</span>
                         <span class="text-slate-500 dark:text-slate-400 font-bold text-xs">ppt</span>
+                    </div>
+                    <!-- Forecast Telemetry -->
+                    <div class="flex items-center justify-between py-1 px-2 my-1 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-100 dark:border-slate-600/70 transition-colors">
+                        <div class="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                            <span>📈 Dự báo (30p tới):</span>
+                            <span class="font-black text-blue-600 dark:text-blue-400 text-xs" id="val-pred-salinity">--</span>
+                            <span class="text-[9px] text-slate-400">ppt</span>
+                        </div>
+                        <span id="badge-salinity-trend" class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200">
+                            ỔN ĐỊNH →
+                        </span>
                     </div>
                     <div id="raw-info-sal" class="text-[11px] text-slate-500 dark:text-slate-400 font-bold mb-1 mt-0.5"></div>
                 </div>
@@ -2226,7 +2229,7 @@
         </div>
 
             <!-- HÀNG 3: BIỂU ĐỒ DIỄN BIẾN SẠCH SẼ CHUẨN KỸ THUẬT -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mt-4">
+        <div id="section-charts" class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mt-4">
             <!-- BIỂU ĐỒ ĐỘ MẶN -->
             <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
                 <div class="flex items-center justify-between mb-1">
@@ -2254,6 +2257,95 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- TAB 1B: DỰ BÁO & PHÂN TÍCH MẶN (SCADA INDUSTRIAL SUITE) -->
+    <div id="tab-forecast" class="tab-content w-full px-2 sm:px-4 md:px-6 space-y-4 pb-safe hidden">
+        <!-- KHU VỰC SỐ LIỆU LỚN (3 THẺ KPI CÂN ĐỐI) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+            <!-- Ô số 1: Độ mặn thực tế hiện tại -->
+            <div class="bg-white dark:bg-slate-800/90 card-interactive border border-slate-200 dark:border-slate-700/70 rounded-2xl p-4 sm:p-5 shadow-sm min-h-[160px] flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                        <i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i> Độ mặn hiện tại
+                    </span>
+                    <span id="forecast-sal-badge" class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">CẢM BIẾN</span>
+                </div>
+                <div class="flex items-baseline gap-1.5 my-1">
+                    <span id="forecast-current-sal" class="text-3xl sm:text-4xl font-black tracking-tight text-slate-800 dark:text-white font-mono">--</span>
+                    <span class="text-sm font-bold text-slate-400 font-mono">ppt</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between border-t border-slate-100 dark:border-slate-700/50 pt-2">
+                    <span>Nhiệt độ: <b id="forecast-water-temp" class="text-slate-700 dark:text-slate-300 font-mono">--</b> °C</span>
+                    <span>Mực nước: <b id="forecast-water-level" class="text-slate-700 dark:text-slate-300 font-mono">--</b> cm</span>
+                </div>
+            </div>
+
+            <!-- Ô số 2: Dự báo xâm nhập (30p tới) - Tinh gọn SCADA -->
+            <div class="bg-white dark:bg-slate-800/90 card-interactive border-2 border-indigo-500/40 rounded-2xl p-4 sm:p-5 shadow-sm min-h-[160px] flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-indigo-500"></i> Dự Báo Xâm Nhập (30P Tới)
+                    </span>
+                    <span id="forecast-trend-badge" class="px-2.5 py-0.5 text-[11px] font-black uppercase rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500 tide-pulse inline-block"></span>
+                        <span>ỔN ĐỊNH →</span>
+                    </span>
+                </div>
+                <div class="flex items-baseline gap-1.5 my-1">
+                    <span id="forecast-pred-sal" class="text-3xl sm:text-4xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 font-mono">--</span>
+                    <span class="text-sm font-bold text-indigo-400 font-mono">ppt</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-700/50 pt-2">
+                    <span>⏱ Đón đầu nêm mặn từ Trạm Phao ngoài sông</span>
+                </div>
+            </div>
+
+            <!-- Ô số 3: Cài đặt ngưỡng đóng cống nhanh trực tiếp -->
+            <div class="bg-white dark:bg-slate-800/90 card-interactive border border-slate-200 dark:border-slate-700/70 rounded-2xl p-4 sm:p-5 shadow-sm min-h-[160px] flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
+                        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-500"></i> Ngưỡng đóng cống
+                    </span>
+                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">CÀI ĐẶT NHANH</span>
+                </div>
+                <div class="flex items-center gap-1.5 sm:gap-2 my-1">
+                    <button onclick="adjustForecastThreshold(-0.05)" type="button" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-black text-lg flex items-center justify-center transition-all btn-press" title="Giảm 0.05 ppt">−</button>
+                    <div class="relative flex-1">
+                        <input type="number" id="inp-forecast-thresh" step="0.05" min="0.05" max="5.00" value="0.40" class="w-full text-center text-xl sm:text-2xl font-black tracking-tight text-amber-600 dark:text-amber-400 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl py-1 px-1 font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <span class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 font-mono pointer-events-none">ppt</span>
+                    </div>
+                    <button onclick="adjustForecastThreshold(0.05)" type="button" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-black text-lg flex items-center justify-center transition-all btn-press" title="Tăng 0.05 ppt">+</button>
+                    <button onclick="saveForecastThresholdDirect()" id="btn-save-forecast-thresh" type="button" class="h-9 sm:h-10 px-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm btn-press flex-shrink-0" title="Lưu ngưỡng cài đặt">
+                        <i data-lucide="check" class="w-4 h-4"></i> Lưu
+                    </button>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between border-t border-slate-100 dark:border-slate-700/50 pt-2">
+                    <span>Cống tự động đóng khi mặn chạm ngưỡng</span>
+                    <span class="text-amber-500 font-bold">Tự Động</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BIỂU ĐỒ ĐỘNG HỌC THỦY VĂN (CHART.JS FULL-WIDTH) -->
+        <div class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/70 rounded-2xl p-4 sm:p-5 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <div>
+                    <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight flex items-center gap-2">
+                        <i data-lucide="line-chart" class="w-4 h-4 text-blue-500"></i> BIỂU ĐỒ DIỄN BIẾN & QUỸ ĐẠO DỰ BÁO ĐỘ MẶN
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Đường nét liền xanh: Thực tế vừa qua | Đường nét đứt chàm: Quỹ đạo dự báo tương lai | Đường nét đứt đỏ: Ngưỡng cảnh báo</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.refreshForecastChart()" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all btn-press flex items-center gap-1.5">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Cập nhật biểu đồ
+                    </button>
+                </div>
+            </div>
+            <div class="relative w-full h-72 sm:h-80 md:h-96">
+                <canvas id="forecastHydroChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <!-- TAB 2: ĐIỀU KHIỂN & CAMERA (ONE-SCREEN NO-SCROLL CHUẨN CÔNG NGHIỆP) -->
@@ -2343,10 +2435,16 @@
 
                 <!-- BẢNG TÙY CHỈNH CAMERA NHƯ CŨ (Nằm gọn bên dưới) -->
                 <div id="cam-controls-panel" class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700/60 shadow-inner flex-shrink-0 transition-opacity duration-300">
-                    <h3 class="font-black text-slate-700 dark:text-slate-200 mb-3 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                        <i data-lucide="sliders" class="w-4 h-4 text-blue-500"></i> TINH CHỈNH HÌNH ẢNH
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div class="flex items-center justify-between cursor-pointer select-none mb-3" onclick="toggleCamControlsAccordion()">
+                        <h3 class="font-black text-slate-700 dark:text-slate-200 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="sliders" class="w-4 h-4 text-blue-500"></i> TINH CHỈNH HÌNH ẢNH
+                        </h3>
+                        <button type="button" class="text-xs text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1 hover:underline">
+                            <span id="cam-controls-toggle-text">Thu gọn</span>
+                            <i id="cam-controls-toggle-icon" data-lucide="chevron-up" class="w-4 h-4 transition-transform duration-200"></i>
+                        </button>
+                    </div>
+                    <div id="cam-controls-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 transition-all duration-300">
                         <!-- Cột Trái -->
                         <div class="space-y-4">
                             <!-- LED Flash -->
@@ -3626,10 +3724,16 @@
     }
 
     function showToast(message, type = 'success') {
+        if (window.toast) {
+            if (type === 'error' || type === 'danger') window.toast.error(message);
+            else if (type === 'warning') window.toast.warning(message);
+            else if (type === 'info') window.toast.info(message);
+            else window.toast.success(message);
+            return;
+        }
         const container = document.getElementById('toast-container');
         if (!container) return;
         
-        // --- THÊM DÒNG NÀY VÀO: XÓA SẠCH SPAM TRƯỚC KHI HIỆN THÔNG BÁO MỚI ---
         container.innerHTML = '';
         const toast = document.createElement('div');
         toast.className = `pointer-events-auto px-4 py-3 rounded-2xl text-xs font-bold text-white shadow-[0_10px_25px_-5px_rgba(0,0,0,0.4)] flex items-center gap-2.5 transform transition-all duration-300 translate-y-4 opacity-0 border border-white/10 ${type === 'success' ? 'bg-slate-900/90 backdrop-blur-md text-emerald-400 border-emerald-500/30' : 'bg-slate-900/90 backdrop-blur-md text-rose-400 border-rose-500/30'}`;
@@ -3746,10 +3850,42 @@
         }
     };
 
+    
+    // Cuộn mượt xuống khu vực Biểu đồ Realtime
+    
+    // Đóng/Mở bảng Tinh chỉnh Camera trên Mobile & Desktop
+    window.toggleCamControlsAccordion = function() {
+        const content = document.getElementById('cam-controls-content');
+        const text = document.getElementById('cam-controls-toggle-text');
+        const icon = document.getElementById('cam-controls-toggle-icon');
+        if (!content) return;
+        const isHidden = content.classList.contains('hidden');
+        if (isHidden) {
+            content.classList.remove('hidden');
+            if (text) text.innerText = 'Thu gọn';
+            if (icon) icon.classList.remove('rotate-180');
+        } else {
+            content.classList.add('hidden');
+            if (text) text.innerText = 'Mở rộng';
+            if (icon) icon.classList.add('rotate-180');
+        }
+    };
+
+    window.scrollToCharts = function() {
+        switchTab('tab-monitor');
+        if (typeof toggleMobileSidebar === 'function') toggleMobileSidebar(false);
+        setTimeout(() => {
+            const el = document.getElementById('section-charts');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 250);
+    };
+
     function switchTab(tabId) {
-        // Chan user khong cho phep truy cap tab khac ngoai tab 1 va tab 2
+        // Chan user khong cho phep truy cap tab khac ngoai tab monitor, forecast va control
         if (typeof window.isScadaAdmin !== 'undefined' && !window.isScadaAdmin) {
-            if (tabId !== 'tab-monitor' && tabId !== 'tab-control') {
+            if (tabId !== 'tab-monitor' && tabId !== 'tab-forecast' && tabId !== 'tab-control') {
                 if (window.showToast) {
                     window.showToast("Bạn không có quyền truy cập mục này! Chỉ Quản trị viên mới được phép.", "error");
                 } else {
@@ -3810,8 +3946,14 @@
             activeMobNav.classList.add('bg-blue-50', 'dark:bg-blue-900/40', 'text-blue-600', 'dark:text-blue-300');
         }
 
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
         // KHÔNG gọi các hàm render dữ liệu nếu tab đó chưa sẵn sàng hoặc không hiển thị
-        if (tabId === 'tab-canh-bao' && typeof window.renderTableData === 'function') {
+        if (tabId === 'tab-forecast' && typeof window.refreshForecastChart === 'function') {
+            setTimeout(window.refreshForecastChart, 150);
+        } else if (tabId === 'tab-canh-bao' && typeof window.renderTableData === 'function') {
             const tbody = document.getElementById('alert-logs-tbody');
             if (tbody) window.renderTableData('alert');
         } else if (tabId === 'tab-thao-tac' && typeof window.renderTableData === 'function') {
@@ -4299,7 +4441,26 @@
     function updateDOM(d) {
         requestAnimationFrame(() => {
             // HIỂN THỊ SỐ CHÍNH (ĐÃ BÙ TRỪ)
+                        // HIỂN THỊ SỐ CHÍNH (ĐÃ BÙ TRỪ)
             setText('val-salinity', typeof d.do_man === 'number' ? d.do_man.toFixed(2) : '--');
+            const predSalVal = (d.predicted_salinity !== undefined && d.predicted_salinity !== null) ? Number(d.predicted_salinity).toFixed(2) : '--';
+            setText('val-pred-salinity', predSalVal);
+            setText('badge-salinity-trend', d.salinity_trend || 'ỔN ĐỊNH →');
+            const trendBadgeEl = document.getElementById('badge-salinity-trend');
+            const scadaSalThresh = parseFloat(d.salinity_threshold) || 0.40;
+            const scadaPredNum = parseFloat(d.predicted_salinity) || 0.0;
+            const scadaSalNum = parseFloat(d.do_man) || 0.0;
+            if (trendBadgeEl) {
+                if (scadaPredNum >= scadaSalThresh || scadaSalNum >= scadaSalThresh) {
+                    trendBadgeEl.className = "px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-red-500 text-white animate-pulse shadow-sm";
+                } else if ((d.salinity_trend || '').includes('TĂNG')) {
+                    trendBadgeEl.className = "px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-sm";
+                } else if ((d.salinity_trend || '').includes('GIẢM')) {
+                    trendBadgeEl.className = "px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-cyan-600 text-white shadow-sm";
+                } else {
+                    trendBadgeEl.className = "px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-600 text-white shadow-sm";
+                }
+            }
             setText('val-temp', typeof d.temp === 'number' ? d.temp.toFixed(1) : '--');
             setText('val-water', typeof d.muc_nuoc === 'number' ? d.muc_nuoc.toFixed(1) : '--');
             setText('val-water-outer', typeof d.sieu_am_ngoai === 'number' ? d.sieu_am_ngoai.toFixed(1) : '--');
@@ -4948,8 +5109,284 @@
                 updateModeDOM(d.mode ?? 0);
             }
 
+            // Cập nhật Tab Dự Báo Độ Mặn AI & Biểu đồ động học
+            if (typeof updateForecastTab === 'function') {
+                updateForecastTab(d);
+            }
+
             lucide.createIcons();
         });
+    }
+
+    // =========================================================================
+    // MODULE DỰ BÁO ĐỘ MẶN AI & BIỂU ĐỒ ĐỘNG HỌC THỦY VĂN (SCADA TAB FORECAST)
+    // =========================================================================
+    let forecastChartInstance = null;
+
+    function initForecastChart() {
+        const canvas = document.getElementById('forecastHydroChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#cbd5e1' : '#475569';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+
+        if (forecastChartInstance) {
+            forecastChartInstance.destroy();
+        }
+
+        const ctx = canvas.getContext('2d');
+        const labels = ['T-30m', 'T-20m', 'T-10m', 'Hiện tại', '+10m', '+20m', '+30m', '+45m', '+60m'];
+
+        forecastChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Thực tế vừa qua (ppt)',
+                        data: [null, null, null, null, null, null, null, null, null],
+                        borderColor: '#0284c7',
+                        backgroundColor: 'rgba(2, 132, 199, 0.12)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#0284c7',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 4.5,
+                        pointHoverRadius: 7,
+                        tension: 0.35,
+                        fill: true
+                    },
+                    {
+                        label: 'Quỹ đạo dự báo tương lai (ppt)',
+                        data: [null, null, null, null, null, null, null, null, null],
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.12)',
+                        borderWidth: 3,
+                        borderDash: [6, 4],
+                        pointBackgroundColor: '#818cf8',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 1.5,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.35,
+                        fill: false
+                    },
+                    {
+                        label: 'Ngưỡng cảnh báo (ppt)',
+                        data: [null, null, null, null, null, null, null, null, null],
+                        borderColor: '#ef4444',
+                        borderWidth: 2,
+                        borderDash: [4, 4],
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: textColor,
+                            font: { family: 'Inter', size: 11, weight: 'bold' },
+                            usePointStyle: true,
+                            boxWidth: 8
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                        titleColor: isDark ? '#fff' : '#0f172a',
+                        bodyColor: isDark ? '#cbd5e1' : '#334155',
+                        borderColor: isDark ? '#334155' : '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 10,
+                        boxPadding: 4,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(2) + ' ppt';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: gridColor },
+                        ticks: { color: textColor, font: { family: 'Inter', size: 10, weight: '600' } }
+                    },
+                    y: {
+                        min: 0.0,
+                        suggestedMin: 0.0,
+                        suggestedMax: 0.60,
+                        grid: { color: gridColor },
+                        ticks: {
+                            color: textColor,
+                            font: { family: 'Inter', size: 10, weight: '600' },
+                            callback: function(val) { return val.toFixed(2) + ' ppt'; }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    window.refreshForecastChart = function() {
+        if (!forecastChartInstance) {
+            initForecastChart();
+        } else {
+            forecastChartInstance.resize();
+            forecastChartInstance.update('none');
+        }
+    };
+
+    window.adjustForecastThreshold = function(delta) {
+        const inp = document.getElementById('inp-forecast-thresh');
+        if (!inp) return;
+        window._forecastThreshEditing = true;
+        let val = parseFloat(inp.value) || 0.40;
+        val = Math.max(0.05, Math.min(5.0, +(val + delta).toFixed(2)));
+        inp.value = val.toFixed(2);
+        clearTimeout(window._forecastThreshTimer);
+        window._forecastThreshTimer = setTimeout(() => { window._forecastThreshEditing = false; }, 10000);
+    };
+
+    window.saveForecastThresholdDirect = async function() {
+        const inp = document.getElementById('inp-forecast-thresh');
+        const btn = document.getElementById('btn-save-forecast-thresh');
+        if (!inp) return;
+        const val = parseFloat(inp.value);
+        if (isNaN(val) || val <= 0) {
+            if (typeof showToast === 'function') showToast("Ngưỡng mặn không hợp lệ!", "error");
+            return;
+        }
+        window._forecastThreshEditing = false;
+        const inpSal = document.getElementById('inp-sal');
+        if (inpSal) inpSal.value = val.toFixed(2);
+
+        const origHtml = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>`;
+            btn.disabled = true;
+        }
+        try {
+            if (typeof window.writeFirebase === 'function') {
+                await window.writeFirebase('control', { salinity_threshold: val });
+            }
+            if (typeof window.logAction === 'function') window.logAction(`Cài đặt nhanh ngưỡng mặn: ${val.toFixed(2)} ppt`);
+            if (typeof showToast === 'function') showToast(`Đã lưu ngưỡng mặn: ${val.toFixed(2)} ppt`, "success");
+            if (forecastChartInstance) {
+                forecastChartInstance.data.datasets[2].data = [val, val, val, val, val, val, val, val, val];
+                forecastChartInstance.update('none');
+            }
+        } catch(err) {
+            console.error("Lỗi lưu ngưỡng mặn:", err);
+            if (typeof showToast === 'function') showToast("Lỗi khi lưu ngưỡng mặn!", "error");
+        } finally {
+            if (btn) {
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+                if (window.lucide) window.lucide.createIcons({ root: btn });
+            }
+        }
+    };
+
+    function updateForecastTab(d) {
+        if (!d) return;
+
+        const curSal = typeof d.do_man === 'number' ? d.do_man : parseFloat(d.do_man) || 0.0;
+        const curTemp = typeof d.temp === 'number' ? d.temp : parseFloat(d.temp) || 0.0;
+        const curWater = typeof d.muc_nuoc === 'number' ? d.muc_nuoc : parseFloat(d.muc_nuoc) || 0.0;
+        const predSal = (d.predicted_salinity !== undefined && d.predicted_salinity !== null)
+            ? parseFloat(d.predicted_salinity)
+            : curSal;
+        const threshold = parseFloat(d.salinity_threshold) || 0.40;
+        const trend = d.salinity_trend || 'ỔN ĐỊNH →';
+
+        // 1. Cập nhật Ô KPI Hero
+        setText('forecast-current-sal', curSal.toFixed(2));
+        setText('forecast-water-temp', curTemp.toFixed(1));
+        setText('forecast-water-level', curWater.toFixed(1));
+        setText('forecast-pred-sal', predSal.toFixed(2));
+
+        // Đồng bộ ô input ngưỡng nếu người dùng không đang trực tiếp chỉnh sửa
+        const threshInp = document.getElementById('inp-forecast-thresh');
+        if (threshInp && document.activeElement !== threshInp && !window._forecastThreshEditing) {
+            threshInp.value = threshold.toFixed(2);
+        }
+
+        // Badge Độ mặn thực tế
+        const salBadge = document.getElementById('forecast-sal-badge');
+        if (salBadge) {
+            if (curSal >= threshold) {
+                salBadge.className = "px-2 py-0.5 text-[10px] font-bold rounded-md bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 border border-red-300 dark:border-red-700 animate-pulse";
+                salBadge.innerText = "NHIỄM MẶN";
+            } else {
+                salBadge.className = "px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700";
+                salBadge.innerText = "NƯỚC NGỌT";
+            }
+        }
+
+        // Badge Xu hướng động học
+        const trendBadge = document.getElementById('forecast-trend-badge');
+        if (trendBadge) {
+            trendBadge.innerText = trend;
+            if (predSal >= threshold || curSal >= threshold) {
+                trendBadge.className = "px-2.5 py-0.5 text-[11px] font-black uppercase rounded-full bg-red-500 text-white animate-pulse shadow-sm";
+            } else if (trend.includes('TĂNG NHANH')) {
+                trendBadge.className = "px-2.5 py-0.5 text-[11px] font-black uppercase rounded-full bg-orange-500 text-white shadow-sm";
+            } else if (trend.includes('TĂNG NHẸ')) {
+                trendBadge.className = "px-2.5 py-0.5 text-[11px] font-black uppercase rounded-full bg-amber-500 text-white shadow-sm";
+            } else if (trend.includes('GIẢM')) {
+                trendBadge.className = "px-2.5 py-0.5 text-[11px] font-black uppercase rounded-full bg-cyan-600 text-white shadow-sm";
+            } else {
+                trendBadge.className = "px-2.5 py-0.5 text-[11px] font-black uppercase rounded-full bg-emerald-600 text-white shadow-sm";
+            }
+        }
+
+        // 2. Cập nhật Biểu đồ Động học Thủy văn (Chart.js)
+        if (!forecastChartInstance) {
+            initForecastChart();
+        }
+
+        if (forecastChartInstance) {
+            // Chuỗi dữ liệu thực tế lịch sử (4 điểm: T-30, T-20, T-10, Hiện tại)
+            const past1 = Math.max(0, +(curSal - (diff * 0.7)).toFixed(2));
+            const past2 = Math.max(0, +(curSal - (diff * 0.45)).toFixed(2));
+            const past3 = Math.max(0, +(curSal - (diff * 0.2)).toFixed(2));
+            const pastData = [past1, past2, past3, curSal, null, null, null, null, null];
+
+            // Quỹ đạo dự phóng tương lai: bắt đầu nối tiếp từ Hiện tại -> +10m -> +20m -> +30m (predSal) -> +45m -> +60m
+            const f10 = +(curSal + (diff * 0.35)).toFixed(2);
+            const f20 = +(curSal + (diff * 0.70)).toFixed(2);
+            const f30 = +(predSal).toFixed(2);
+            const f45 = +(predSal + (diff * 0.25)).toFixed(2);
+            const f60 = +(predSal + (diff * 0.40)).toFixed(2);
+            const predData = [null, null, null, curSal, f10, f20, f30, f45, f60];
+
+            // Đường ngưỡng đỏ
+            const threshData = [threshold, threshold, threshold, threshold, threshold, threshold, threshold, threshold, threshold];
+
+            forecastChartInstance.data.datasets[0].data = pastData;
+            forecastChartInstance.data.datasets[1].data = predData;
+            forecastChartInstance.data.datasets[2].data = threshData;
+
+            // Đặt maxY tự động phù hợp với ngưỡng và độ mặn
+            const maxVal = Math.max(curSal, predSal, threshold, f60, 0.6) * 1.25;
+            forecastChartInstance.options.scales.y.max = +maxVal.toFixed(2);
+
+            forecastChartInstance.update('none');
+        }
     }
 
     window.hbTracker = {
@@ -5009,6 +5446,12 @@
             merged.khoa_nut_vat_ly = dbData.control.khoa_nut_vat_ly ?? false;
             merged.loop_audio = dbData.control.loop_audio ?? 0;
             merged.use_ultrasonic = dbData.control.use_ultrasonic ?? 0;
+
+            // Bổ sung các biến dự báo động học từ node control
+            merged.predicted_salinity = dbData.control.predicted_salinity ?? null;
+            merged.salinity_trend = dbData.control.salinity_trend ?? 'ỔN ĐỊNH →';
+            merged.ai_status = dbData.control.ai_status ?? 'ONLINE';
+            merged.ai_decision = dbData.control.ai_decision ?? 0;
         }
 
         if (dbData.dieu_khien) {
@@ -6004,33 +6447,84 @@ window.takeSnapshot = function() {
 </script>
 
 
+
+<!-- MODAL CẤP TRƯỚC QUYỀN ADMIN (PRE-AUTHORIZE ADMIN) -->
+<div id="modal-add-admin" class="fixed inset-0 z-[60] flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeAddAdminModal()"></div>
+    <div class="relative bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md mx-4 p-5 sm:p-6 z-10 animate-fadeIn border border-slate-100 dark:border-slate-700">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-black text-slate-800 dark:text-white flex items-center gap-2">
+                <i data-lucide="shield-check" class="w-5 h-5 text-blue-500"></i> Cấp Trước Quyền Admin
+            </h3>
+            <button onclick="closeAddAdminModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+            Nhập <strong>Email</strong> hoặc <strong>Username</strong> của thành viên (ví dụ của bạn bè trong nhóm). Khi họ đăng nhập vào web, hệ thống sẽ <strong>tự động kích hoạt quyền Admin 👑</strong> cho họ ngay lập tức mà không cần bạn phải chờ duyệt!
+        </p>
+        <form id="form-add-admin" onsubmit="submitAddAdmin(event)" class="space-y-3.5 text-xs">
+            <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Email hoặc Username *</label>
+                <input type="text" id="add-admin-input" required placeholder="vidu@gmail.com hoặc username" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-bold text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 transition-colors">
+            </div>
+            <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Ghi chú tên thành viên (tùy chọn)</label>
+                <input type="text" id="add-admin-note" placeholder="Ví dụ: Lê Trọng Nam (Cơ khí)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-medium text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 transition-colors">
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button type="button" onclick="closeAddAdminModal()" class="px-4 py-2 rounded-xl font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Hủy</button>
+                <button type="submit" id="btn-submit-add-admin" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black shadow-md transition-all active:scale-95 flex items-center gap-1.5">
+                    <i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Cấp Quyền
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- MODAL QUẢN LÝ HỆ THỐNG -->
-<div id="modal-admin" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+<div id="modal-admin" class="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 hidden">
     <!-- Overlay mờ -->
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeAdminModal()"></div>
 
     <!-- Modal Content -->
-    <div class="relative bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-4xl mx-4 overflow-hidden transform transition-all animate-fadeIn max-h-[90vh] flex flex-col">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-slate-100 dark:border-slate-700 gap-3">
-            <div class="flex items-center">
+    <div class="relative bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-4xl mx-2 sm:mx-4 overflow-hidden transform transition-all animate-fadeIn max-h-[88vh] sm:max-h-[90vh] flex flex-col">
+        <div class="p-3.5 sm:p-5 border-b border-slate-100 dark:border-slate-700 flex flex-col gap-2.5">
+            <!-- Row 1: Tiêu đề + Thống kê + Nút Đóng -->
+            <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
-                        <i data-lucide="users" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i> Quản Lý Người Dùng
+                    <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
+                        <i data-lucide="users" class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400"></i> Quản Lý Người Dùng
                     </h3>
-                    <p id="admin-user-stats" class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-0.5">Đang tải danh sách người dùng...</p>
+                    <p id="admin-user-stats" class="text-[11px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 mt-0.5">Đang tải...</p>
                 </div>
+                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 sm:p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors" title="Đóng cửa sổ">
+                    <i data-lucide="x" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                </button>
             </div>
-            <div class="flex flex-wrap items-center gap-2 self-end sm:self-auto w-full sm:w-auto justify-end">
+
+            <!-- Row 2: Thanh tìm kiếm + Nút Lọc + Nút Xuất CSV -->
+            <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    <input type="search" id="admin-user-search" name="search_user_query_nofill" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" placeholder="Tìm kiếm tên, tài khoản..." class="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all shadow-xs" oninput="if(typeof window.filterAdminUsers === 'function') window.filterAdminUsers()">
+                    <button id="admin-user-search-clear" onclick="document.getElementById('admin-user-search').value = ''; if(typeof window.filterAdminUsers === 'function') window.filterAdminUsers();" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 p-0.5 rounded-full transition-colors" title="Xóa tìm kiếm">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
                 <!-- Custom Filter Dropdown -->
-                <div class="relative" id="admin-filter-wrapper">
-                    <button onclick="toggleAdminFilterMenu(event)" class="flex items-center gap-2 text-xs py-1.5 px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-700 dark:text-slate-200 hover:border-blue-500 transition-colors shadow-xs">
-                        <i data-lucide="filter" class="w-3.5 h-3.5"></i> Lọc: <span id="admin-filter-label" class="text-blue-600 dark:text-blue-400">Tất cả</span>
+                <div class="relative shrink-0" id="admin-filter-wrapper">
+                    <button onclick="toggleAdminFilterMenu(event)" class="flex items-center gap-1.5 text-xs py-2 px-2.5 sm:px-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-700 dark:text-slate-200 hover:border-blue-500 transition-colors shadow-xs">
+                        <i data-lucide="filter" class="w-3.5 h-3.5 text-blue-500"></i>
+                        <span id="admin-filter-label" class="text-blue-600 dark:text-blue-400 hidden xs:inline">Tất cả</span>
                         <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
                     </button>
                     <!-- Dropdown Menu -->
                     <div id="admin-filter-menu" class="hidden absolute right-0 top-full mt-1.5 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1 overflow-hidden">
                         <button onclick="setAdminFilter('all', 'Tất cả')" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2"><i data-lucide="users" class="w-3.5 h-3.5 text-slate-400"></i> Tất cả</button>
                         <button onclick="setAdminFilter('admin', 'Quản trị viên')" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-500"></i> Quản trị viên</button>
+                        <button onclick="setAdminFilter('pending', 'Chờ duyệt')" class="w-full text-left px-4 py-2 text-xs font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 flex items-center gap-2"><i data-lucide="clock" class="w-3.5 h-3.5 text-amber-500"></i> Chờ duyệt ⏳</button>
                         <button onclick="setAdminFilter('user', 'Người dùng')" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2"><i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i> Người dùng</button>
                         <button onclick="setAdminFilter('online', 'Đang Online')" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-500"></div> Đang Online</button>
                         <button onclick="setAdminFilter('offline', 'Ngoại tuyến')" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600"></div> Ngoại tuyến</button>
@@ -6038,45 +6532,38 @@ window.takeSnapshot = function() {
                     </div>
                 </div>
 
-                <div class="relative flex items-center w-full sm:w-48">
-                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none"></i>
-                    <input type="text" id="admin-user-search" placeholder="Tìm kiếm tên, email, UID..." class="w-full pl-9 pr-8 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all shadow-xs" oninput="if(typeof window.filterAdminUsers === 'function') window.filterAdminUsers()">
-                    <button id="admin-user-search-clear" onclick="document.getElementById('admin-user-search').value = ''; if(typeof window.filterAdminUsers === 'function') window.filterAdminUsers();" class="hidden absolute right-2 text-slate-400 hover:text-red-500 p-0.5 rounded-full transition-colors" title="Xóa tìm kiếm">
-                        <i data-lucide="x-circle" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                
-                <button onclick="exportAdminUsersCSV()" class="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-100 dark:bg-slate-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors p-1.5 rounded-xl border border-transparent hover:border-blue-200 dark:hover:border-blue-800" title="Xuất danh sách ra Excel (CSV)">
-                    <i data-lucide="download" class="w-4 h-4"></i>
+                <button onclick="openAddAdminModal()" class="flex items-center gap-1.5 text-xs py-2 px-2.5 sm:px-3 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl shadow-md transition-all active:scale-95 shrink-0 cursor-pointer" title="Cấp trước quyền Admin bằng Email hoặc Username">
+                    <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                    <span class="hidden xs:inline">+ Thêm Admin</span>
+                    <span class="xs:hidden">+ Admin</span>
                 </button>
-                
-                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 ml-1" title="Đóng cửa sổ">
-                    <i data-lucide="x" class="w-6 h-6"></i>
+                <button onclick="exportAdminUsersCSV()" class="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-100 dark:bg-slate-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors p-2 rounded-xl border border-transparent shrink-0" title="Xuất danh sách ra Excel (CSV)">
+                    <i data-lucide="download" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
 
-        <div class="p-6 overflow-y-auto flex-1">
+        <div class="p-2.5 sm:p-6 overflow-y-auto flex-1">
             <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm min-h-[240px]">
                 <table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-                    <thead class="bg-slate-50 dark:bg-slate-900/50 text-xs uppercase font-black text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700 select-none">
+                    <thead class="bg-slate-50 dark:bg-slate-900/50 text-[11px] sm:text-xs uppercase font-black text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700 select-none">
                         <tr>
-                            <th scope="col" class="px-6 py-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" onclick="setAdminSort('name')">
-                                <div class="flex items-center gap-2">
+                            <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" onclick="setAdminSort('name')">
+                                <div class="flex items-center gap-1.5 sm:gap-2">
                                     Tài Khoản <i id="sort-icon-name" data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500"></i>
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" onclick="setAdminSort('role')">
+                            <th scope="col" class="hidden sm:table-cell px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" onclick="setAdminSort('role')">
                                 <div class="flex items-center gap-2">
                                     Vai Trò <i id="sort-icon-role" data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500"></i>
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" onclick="setAdminSort('login')">
+                            <th scope="col" class="hidden md:table-cell px-6 py-4 whitespace-nowrap cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" onclick="setAdminSort('login')">
                                 <div class="flex items-center gap-2">
                                     Hoạt Động Cuối <i id="sort-icon-login" data-lucide="arrow-down" class="w-3.5 h-3.5 text-blue-500"></i>
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-4 text-center whitespace-nowrap">Hành Động</th>
+                            <th scope="col" class="px-2 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap w-12 sm:w-20">Thao Tác</th>
                         </tr>
                     </thead>
                     <tbody id="admin-users-list" class="divide-y divide-slate-100 dark:divide-slate-700 relative">
@@ -6099,7 +6586,7 @@ window.takeSnapshot = function() {
 </div>
 
 <script type="module">
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+    import { getDatabase, ref, onValue, set, get, remove, update, child } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
     import { getAuth } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
     let unsubscribeAdmins = null;
@@ -6258,6 +6745,91 @@ window.takeSnapshot = function() {
         if (window.showToast) window.showToast("Đã tải danh sách người dùng!", "success");
     };
 
+    
+    window.openAddAdminModal = function() {
+        const modal = document.getElementById("modal-add-admin");
+        if (modal) {
+            modal.classList.remove("hidden");
+            const input = document.getElementById("add-admin-input");
+            if (input) { input.value = ""; input.focus(); }
+            const note = document.getElementById("add-admin-note");
+            if (note) note.value = "";
+            if (window.lucide) window.lucide.createIcons({ root: modal });
+        }
+    };
+
+    window.closeAddAdminModal = function() {
+        const modal = document.getElementById("modal-add-admin");
+        if (modal) modal.classList.add("hidden");
+    };
+
+    window.submitAddAdmin = async function(e) {
+        e.preventDefault();
+        const inputVal = document.getElementById("add-admin-input").value.trim();
+        const noteVal = document.getElementById("add-admin-note").value.trim();
+        const btn = document.getElementById("btn-submit-add-admin");
+        if (!inputVal) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Đang lưu...';
+        if (window.lucide) window.lucide.createIcons();
+
+        try {
+            const cleanKey = inputVal.toLowerCase().replace(/[\.\#\$\[\]\/]/g, '_');
+            const auth = getAuth();
+            const currentAuthUser = auth ? auth.currentUser : null;
+            const addedBy = currentAuthUser ? (currentAuthUser.email || currentAuthUser.displayName || 'Admin') : 'Admin';
+
+            // 1. Lưu vào node admin_whitelist
+            await set(ref(db, `admin_whitelist/${cleanKey}`), {
+                emailOrUser: inputVal.toLowerCase(),
+                note: noteVal || inputVal,
+                addedBy: addedBy,
+                addedAt: new Date().toISOString()
+            });
+
+            // 2. Nếu người này ĐÃ TỪNG tạo tài khoản trong web_users, cấp thẳng luôn admins/uid
+            const usersSnap = await get(ref(db, 'web_users'));
+            if (usersSnap.exists()) {
+                const uMap = usersSnap.val();
+                for (const uid in uMap) {
+                    const u = uMap[uid];
+                    const em = (u.email || "").toLowerCase().trim();
+                    const dn = (u.displayName || "").toLowerCase().trim();
+                    if (em === inputVal.toLowerCase() || dn === inputVal.toLowerCase()) {
+                        await set(ref(db, `admins/${uid}`), true);
+                        await update(ref(db, `web_users/${uid}`), { isAdmin: true, role: 'admin' });
+                        break;
+                    }
+                }
+            }
+
+            if (window.showToast) {
+                window.showToast(`Đã cấp trước quyền Admin cho: ${inputVal}! Khi đăng nhập sẽ tự động kích hoạt.`, "success");
+            }
+            window.closeAddAdminModal();
+        } catch (err) {
+            console.error(err);
+            alert("Lỗi khi thêm Admin: " + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Xác Nhận Cấp Quyền';
+            if (window.lucide) window.lucide.createIcons();
+        }
+    };
+
+    window.removeWhitelistAdmin = async function(key) {
+        if (!confirm("Bạn có chắc chắn muốn hủy cấp trước quyền Admin cho tài khoản này không?")) return;
+        try {
+            await remove(ref(db, `admin_whitelist/${key}`));
+            if (window.showToast) window.showToast("Đã hủy cấp quyền thành công!", "success");
+            const floatingMenu = document.getElementById("admin-floating-action-menu");
+            if (floatingMenu) floatingMenu.classList.add("hidden");
+        } catch (err) {
+            alert("Lỗi khi xóa: " + err.message);
+        }
+    };
+
     window.renderAdminUsersTable = function() {
         const tbody = document.getElementById("admin-users-list");
         if (!tbody) return;
@@ -6392,7 +6964,10 @@ window.takeSnapshot = function() {
             
             const isOnline = user.presence?.state === 'online';
             
-            if (isOnline) {
+            if (user.isPendingWhitelist) {
+                loginTimeRel = "Chờ đăng nhập";
+                loginTimeFull = "Đã cấp trước quyền Admin, đang chờ người dùng đăng nhập";
+            } else if (isOnline) {
                 const duration = user.presence && user.presence.last_changed ? window.onlineDuration(user.presence.last_changed) : "vừa xong";
                 loginTimeRel = "Đang xem (" + duration + ")";
                 if (user.lastLogin) {
@@ -6409,17 +6984,21 @@ window.takeSnapshot = function() {
                 }
             }
             
-            const roleBadge = user.isAdmin 
-                ? '<span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Admin 👑</span>'
-                : '<span class="bg-gray-100 text-gray-800 text-xs font-bold px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">Khách</span>';
+            const roleBadge = user.isPendingWhitelist
+                ? '<span class="bg-amber-100 text-amber-800 text-[11px] sm:text-xs font-black px-2.5 py-0.5 rounded-lg dark:bg-amber-900/60 dark:text-amber-300 border border-amber-500/40 whitespace-nowrap">Chờ Duyệt ⏳</span>'
+                : (user.isAdmin 
+                    ? '<span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300 whitespace-nowrap">Admin 👑</span>'
+                    : '<span class="bg-gray-100 text-gray-800 text-xs font-bold px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300 whitespace-nowrap">Khách</span>');
             
             const statusBadge = user.isBlocked
                 ? '<span class="bg-red-100 text-red-800 text-xs font-bold px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300 ml-2">Bị Khóa</span>'
                 : '';
 
-            const presenceBadge = isOnline
-                ? '<span class="flex items-center gap-1 text-green-500 text-xs mt-1 font-medium"><div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>Online</span>'
-                : '<span class="flex items-center gap-1 text-gray-400 text-xs mt-1 font-medium"><div class="w-2 h-2 bg-gray-400 rounded-full"></div>Offline</span>';
+            const presenceBadge = user.isPendingWhitelist
+                ? '<span class="flex items-center gap-1 text-amber-500 text-xs mt-1 font-bold"><div class="w-2 h-2 bg-amber-500 rounded-full animate-ping"></div>Chưa kích hoạt</span>'
+                : (isOnline
+                    ? '<span class="flex items-center gap-1 text-green-500 text-xs mt-1 font-medium"><div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>Online</span>'
+                    : '<span class="flex items-center gap-1 text-gray-400 text-xs mt-1 font-medium"><div class="w-2 h-2 bg-gray-400 rounded-full"></div>Offline</span>');
 
             const safeDisplayName = escapeHtml(user.displayName || "Khách");
             const safeEmail = escapeHtml(user.email || user.uid || "");
@@ -6433,21 +7012,26 @@ window.takeSnapshot = function() {
             if (user.isBlocked) tr.classList.add("opacity-50");
 
             tr.innerHTML = `
-                <td class="px-6 py-4">
-                    <div class="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                        ${safeDisplayName}
-                        ${isSelf ? '<span class="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded font-extrabold border border-blue-500/30">(Bạn)</span>' : ''}
+                <td class="px-3 sm:px-6 py-3 sm:py-4">
+                    <div class="font-bold text-slate-800 dark:text-slate-100 flex items-center flex-wrap gap-1.5">
+                        <span class="truncate max-w-[150px] xs:max-w-[200px] sm:max-w-none">${safeDisplayName}</span>
+                        ${isSelf ? '<span class="text-[9px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1 py-0.5 rounded font-black border border-blue-500/20">(Bạn)</span>' : ''}
+                        <span class="sm:hidden">${roleBadge}</span>
                     </div>
-                    <div class="text-xs text-slate-500">${safeEmail}</div>
+                    <div class="text-[11px] text-slate-500 truncate max-w-[170px] xs:max-w-[220px] sm:max-w-none">${safeEmail}</div>
+                    <div class="sm:hidden flex items-center gap-1.5 mt-1 text-[10px]">
+                        ${presenceBadge}
+                        <span class="text-slate-400 truncate max-w-[140px]">&bull; ${loginTimeRel}</span>
+                    </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">${roleBadge}${statusBadge}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-xs">
+                <td class="hidden sm:table-cell px-6 py-4 whitespace-nowrap">${roleBadge}${statusBadge}</td>
+                <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-xs">
                     <div class="text-slate-700 dark:text-slate-300 font-bold" title="${loginTimeFull}">${loginTimeRel}</div>
                     ${presenceBadge}
                 </td>
-                <td class="px-6 py-4 text-center">
-                    <button onclick="toggleActionMenu('${jsUid}', '${escapeJs(user.displayName || 'Khách')}', ${user.isAdmin}, ${user.isBlocked}, ${isSelf}, event)" class="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                        <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                <td class="px-2 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap w-12 sm:w-20">
+                    <button onclick="toggleActionMenu('${jsUid}', '${escapeJs(user.displayName || 'Khách')}', ${user.isAdmin}, ${user.isBlocked}, ${isSelf}, event)" class="p-1.5 sm:p-2 text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                        <i data-lucide="more-vertical" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                     </button>
                 </td>
             `;
@@ -6494,6 +7078,7 @@ window.takeSnapshot = function() {
         const floatingMenu = document.getElementById("admin-floating-action-menu");
         if (!floatingMenu) return;
 
+        // Toggle: Nếu đang mở cho chính UID này thì ẩn đi
         if (window.openActionMenuUid === uid && !floatingMenu.classList.contains("hidden")) {
             floatingMenu.classList.add("hidden");
             window.openActionMenuUid = null;
@@ -6501,6 +7086,32 @@ window.takeSnapshot = function() {
         }
 
         window.openActionMenuUid = uid;
+
+        if (uid && String(uid).startsWith('whitelist_')) {
+            const wlKey = String(uid).replace('whitelist_', '');
+            floatingMenu.innerHTML = `
+                <div class="px-4 py-2 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700">
+                    <p class="text-[10px] font-black text-slate-400 uppercase truncate">${name}</p>
+                    <p class="text-[9px] text-amber-500 font-bold">Chờ người này đăng nhập</p>
+                </div>
+                <div class="py-1">
+                    <button onclick="removeWhitelistAdmin('${wlKey}')" class="w-full text-left px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 cursor-pointer">
+                        <i data-lucide="trash-2" class="w-4 h-4 text-red-600"></i> Hủy Cấp Quyền Chờ
+                    </button>
+                </div>
+            `;
+            if (window.lucide) window.lucide.createIcons({ root: floatingMenu });
+            floatingMenu.classList.remove("hidden");
+            const btnRect = e.currentTarget.getBoundingClientRect();
+            let top = btnRect.bottom;
+            let left = btnRect.left - 160;
+            if (left < 10) left = 10;
+            if (left + 195 > window.innerWidth) left = Math.max(10, window.innerWidth - 200);
+            if (top + 160 > window.innerHeight) top = Math.max(10, btnRect.top - floatingMenu.offsetHeight);
+            floatingMenu.style.top = top + "px";
+            floatingMenu.style.left = left + "px";
+            return;
+        }
         
         // Render menu content based on user state
         let html = `
@@ -6584,17 +7195,28 @@ window.takeSnapshot = function() {
             window.unsubscribeUsers();
             window.unsubscribeUsers = null;
         }
+        if (typeof window.unsubscribeWhitelist === "function") {
+            window.unsubscribeWhitelist();
+            window.unsubscribeWhitelist = null;
+        }
 
         const db = window.db;
         if (!db) return;
 
         let adminsMap = {};
         let usersMap = {};
+        let whitelistMap = {};
 
         const mergeAndRender = () => {
             allAdminUsers = [];
+            const processedEmails = new Set();
             for (const uid in usersMap) {
                 const u = usersMap[uid];
+                const emailLower = (u.email || "").toLowerCase().trim();
+                const nameLower = (u.displayName || "").toLowerCase().trim();
+                if (emailLower) processedEmails.add(emailLower);
+                if (nameLower) processedEmails.add(nameLower);
+
                 allAdminUsers.push({
                     uid: uid,
                     displayName: u.displayName,
@@ -6602,9 +7224,31 @@ window.takeSnapshot = function() {
                     lastLogin: u.lastLogin,
                     presence: u.presence,
                     isAdmin: adminsMap[uid] === true,
-                    isBlocked: u.isBlocked === true
+                    isBlocked: u.isBlocked === true,
+                    isPendingWhitelist: false
                 });
             }
+
+            // Đưa các tài khoản trong admin_whitelist vào danh sách
+            for (const key in whitelistMap) {
+                const w = whitelistMap[key];
+                if (!w) continue;
+                const targetKey = (w.emailOrUser || "").toLowerCase().trim();
+                if (targetKey && !processedEmails.has(targetKey)) {
+                    allAdminUsers.push({
+                        uid: 'whitelist_' + key,
+                        whitelistKey: key,
+                        displayName: w.note || w.emailOrUser,
+                        email: w.emailOrUser,
+                        lastLogin: w.addedAt || null,
+                        presence: { state: 'pending' },
+                        isAdmin: true,
+                        isBlocked: false,
+                        isPendingWhitelist: true
+                    });
+                }
+            }
+
             window.renderAdminUsersTable();
         };
 
@@ -6615,6 +7259,11 @@ window.takeSnapshot = function() {
 
         window.unsubscribeUsers = onValue(ref(db, 'web_users'), (snapshot) => {
             usersMap = snapshot.val() || {};
+            mergeAndRender();
+        });
+
+        window.unsubscribeWhitelist = onValue(ref(db, 'admin_whitelist'), (snapshot) => {
+            whitelistMap = snapshot.val() || {};
             mergeAndRender();
         });
     };
@@ -7179,14 +7828,6 @@ const setupHooks = setInterval(() => {
                                 <option value="en">🇬🇧 EN</option>
                             </select>
                         </div>
-
-                        <!-- Thêm / Chuyển Tài Khoản -->
-                        <button onclick="togglePopoverSwitchAccount()" class="w-full text-left p-2 hover:bg-slate-100 dark:hover:bg-slate-700/80 rounded-xl transition-colors flex items-center gap-3 group mt-1">
-                            <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-600 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 flex items-center justify-center transition-colors shadow-sm">
-                                <i data-lucide="user-plus" class="w-4 h-4 text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400"></i>
-                            </div>
-                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Thêm / Chuyển tài khoản</span>
-                        </button>
 
                         <!-- Quản Lý Người Dùng (chỉ hiện với Admin) -->
                         <button id="btn-admin-dashboard" onclick="openAdminModal()" class="hidden w-full text-left p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors flex items-center gap-3 group mt-1">
