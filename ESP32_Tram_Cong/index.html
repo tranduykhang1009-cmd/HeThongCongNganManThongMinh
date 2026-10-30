@@ -1535,7 +1535,7 @@
         .dark .nav-btn-mobile.active i { filter: drop-shadow(0 4px 6px rgba(96, 165, 250, 0.4)); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:text-slate-200 dark:bg-slate-900 transition-colors duration-300 min-h-[100dvh] flex flex-col relative pb-safe ios-touch-scroll pt-[52px] md:pt-0">
+<body class="bg-slate-50 text-slate-800 dark:text-slate-200 dark:bg-slate-900 transition-colors duration-300 min-h-[100dvh] flex flex-col relative pb-safe ios-touch-scroll pt-[92px] md:pt-0">
 
 <!-- SYSTEM TOAST CONTAINER (Thông báo góc dưới bên phải) -->
 <div id="toast-container" class="fixed bottom-24 right-5 z-50 flex flex-col-reverse gap-2.5 pointer-events-none max-w-sm"></div>
@@ -1543,7 +1543,7 @@
 <!-- ================= 1A. MOBILE TOPBAR (GOOGLE FIREBASE CONSOLE STYLE - CHỈ HIỂN THỊ TRÊN MOBILE) ================= -->
 <div class="md:hidden flex items-center justify-between px-3.5 py-2.5 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 fixed top-0 left-0 right-0 z-[60] shadow-sm">
     <!-- Left: Hamburger Button -->
-    <button onclick="toggleMobileSidebar(true)" class="p-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors">
+    <button onclick="toggleMobileSidebar(true)" class="p-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer" title="Mở danh mục điều hướng">
         <i data-lucide="menu" class="w-6 h-6"></i>
     </button>
     
@@ -1556,14 +1556,48 @@
     <!-- Right: Quick Tools & Avatar -->
     <div class="flex items-center gap-1.5">
         <!-- Theme Switcher -->
-        <button onclick="toggleTheme()" class="p-1.5 text-amber-500 dark:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors">
+        <button onclick="toggleTheme()" class="p-1.5 text-amber-500 dark:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors cursor-pointer" title="Đổi giao diện Sáng/Tối">
             <i data-lucide="sun" class="w-4 h-4 dark:hidden"></i>
             <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
         </button>
         <!-- Avatar Button -->
-        <button id="mobile-avatar-btn" onclick="toggleUserMenu(event)" class="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-sm overflow-hidden border border-slate-200 dark:border-slate-700">DK</button>
+        <button id="mobile-avatar-btn" onclick="toggleUserMenu(event)" class="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-sm overflow-hidden border border-slate-200 dark:border-slate-700 cursor-pointer">DK</button>
     </div>
 </div>
+
+<!-- ================= 1A-BIS. MOBILE QUICK TAB STRIP (VUỐT NGANG CHUYỂN TAB TỨC THÌ NHƯ APP) ================= -->
+<nav id="mobile-tab-strip" class="md:hidden fixed top-[49px] left-0 right-0 z-40 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-700/80 px-2 py-1.5 flex items-center gap-1.5 overflow-x-auto whitespace-nowrap hide-scrollbar ios-touch-scroll no-scrollbar shadow-xs">
+    <button onclick="switchTab('tab-monitor')" id="mob-strip-monitor" class="px-2.5 py-1.5 rounded-xl text-xs font-black bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-800 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Giám Sát
+    </button>
+    <button onclick="switchTab('tab-forecast')" id="mob-strip-forecast" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-700/60 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="brain-circuit" class="w-3.5 h-3.5 text-indigo-500"></i> Dự Báo AI
+    </button>
+    <button onclick="switchTab('tab-control')" id="mob-strip-control" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-700/60 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="video" class="w-3.5 h-3.5 text-amber-500"></i> Camera & Đ.Khiển
+    </button>
+    <button onclick="switchTab('tab-settings')" id="mob-strip-settings" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-700/60 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="settings-2" class="w-3.5 h-3.5 text-slate-400"></i> Cài Đặt
+    </button>
+    <button onclick="switchTab('tab-canh-bao')" id="mob-strip-canh-bao" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-700/60 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-red-500"></i> Cảnh Báo
+    </button>
+    <button onclick="switchTab('tab-thao-tac')" id="mob-strip-thao-tac" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-700/60 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="history" class="w-3.5 h-3.5 text-blue-500"></i> Lịch Sử
+    </button>
+    <button onclick="switchTab('tab-phat-thanh')" id="mob-strip-phat-thanh" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-700/60 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="mic" class="w-3.5 h-3.5 text-emerald-500"></i> Loa
+    </button>
+    <button onclick="switchTab('tab-bao-tri')" id="mob-strip-bao-tri" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-700/60 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="wrench" class="w-3.5 h-3.5 text-amber-500"></i> Bảo Trì
+    </button>
+    <a href="album.html" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="images" class="w-3.5 h-3.5"></i> Album
+    </a>
+    <a href="contact.html" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/60 flex items-center gap-1.5 flex-shrink-0 cursor-pointer active:scale-95 transition-all">
+        <i data-lucide="mail" class="w-3.5 h-3.5"></i> Hỗ Trợ
+    </a>
+</nav>
 
 <!-- OVERLAY (Nền mờ đen khi mở Mobile Sidebar) -->
 <div id="mobile-sidebar-overlay" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0 pointer-events-none md:hidden"></div>
@@ -1580,42 +1614,157 @@
                 <p class="text-[10px] text-slate-500 font-bold">Cống Ngăn Mặn Thông Minh</p>
             </div>
         </div>
-        <button onclick="toggleMobileSidebar(false)" class="p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors">
+        <button onclick="toggleMobileSidebar(false)" class="p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors cursor-pointer">
             <i data-lucide="x" class="w-5 h-5"></i>
         </button>
     </div>
 
     <!-- NỘI DUNG SIDEBAR (CÓ CUỘN) -->
-    <div class="flex-1 overflow-y-auto ios-touch-scroll p-4 space-y-5">
+    <div class="flex-1 overflow-y-auto ios-touch-scroll p-4 space-y-4">
 
-        <!-- NHÓM 0: ĐIỀU HƯỚNG CHÍNH -->
+        <!-- NHÓM 1: CÁC TAB ĐIỀU HƯỚNG VẬN HÀNH (ĐẦY ĐỦ 8 TAB CHÍNH) -->
         <div>
-            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 pl-1">Điều Hướng</h4>
+            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 pl-1 flex items-center justify-between">
+                <span>Tab Vận Hành & Giám Sát</span>
+                <span class="text-[9px] font-bold text-blue-500 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">8 Tabs</span>
+            </h4>
             <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm flex flex-col divide-y divide-slate-100 dark:divide-slate-700/50">
-                <button onclick="switchTab('tab-monitor'); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
+                <!-- 1. Giám Sát Realtime -->
+                <button onclick="switchTab('tab-monitor'); toggleMobileSidebar(false);" id="mob-nav-monitor" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full cursor-pointer">
                     <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                        <i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-500"></i> Giám Sát
+                        <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-500"></i>
+                        <span>Giám Sát Realtime</span>
                     </div>
                     <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
-                <button onclick="switchTab('tab-control'); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
+
+                <!-- 2. Dự Báo & Phân Tích AI (Nổi bật) -->
+                <button onclick="switchTab('tab-forecast'); toggleMobileSidebar(false);" id="mob-nav-forecast" class="flex items-center justify-between p-3 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-colors w-full cursor-pointer bg-indigo-50/20 dark:bg-indigo-950/10">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                        <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-500"></i>
+                        <span>Dự Báo & Phân Tích</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">AI R²: 0.90</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-indigo-400"></i>
+                    </div>
+                </button>
+
+                <!-- 3. Camera & Điều Khiển Cống -->
+                <button onclick="switchTab('tab-control'); toggleMobileSidebar(false);" id="mob-nav-control" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full cursor-pointer">
                     <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                        <i data-lucide="video" class="w-4 h-4 text-amber-500"></i> Camera & Điều Khiển
+                        <i data-lucide="video" class="w-4 h-4 text-amber-500"></i>
+                        <span>Camera & Điều Khiển</span>
                     </div>
                     <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
-                <button onclick="scrollToCharts();" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
+
+                <!-- 4. Biểu Đồ Thủy Văn Sóng Triều -->
+                <button onclick="scrollToCharts();" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full cursor-pointer">
                     <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                        <i data-lucide="line-chart" class="w-4 h-4 text-blue-500"></i> Biểu Đồ
+                        <i data-lucide="line-chart" class="w-4 h-4 text-blue-500"></i>
+                        <span>Biểu Đồ Sóng Triều</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+
+                <!-- 5. Cài Đặt Hệ Thống & Ngưỡng Mặn -->
+                <button onclick="switchTab('tab-settings'); toggleMobileSidebar(false);" id="mob-nav-settings" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full cursor-pointer">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <i data-lucide="settings-2" class="w-4 h-4 text-slate-500"></i>
+                        <span>Cài Đặt & Ngưỡng Mặn</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+
+                <!-- 6. Cảnh Báo Sự Cố -->
+                <button onclick="switchTab('tab-canh-bao'); toggleMobileSidebar(false);" id="mob-nav-canh-bao" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full cursor-pointer">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i>
+                        <span>Cảnh Báo Sự Cố</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span id="mob-alert-log-count-sidebar" class="px-1.5 py-0.5 text-[9px] bg-red-500 text-white font-black rounded-full">0</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                    </div>
+                </button>
+
+                <!-- 7. Lịch Sử Thao Tác -->
+                <button onclick="switchTab('tab-thao-tac'); toggleMobileSidebar(false);" id="mob-nav-thao-tac" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full cursor-pointer">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <i data-lucide="history" class="w-4 h-4 text-blue-500"></i>
+                        <span>Lịch Sử Thao Tác</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+
+                <!-- 8. Phát Thanh Loa Cảnh Báo -->
+                <button onclick="switchTab('tab-phat-thanh'); toggleMobileSidebar(false);" id="mob-nav-phat-thanh" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full cursor-pointer">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <i data-lucide="mic" class="w-4 h-4 text-emerald-500"></i>
+                        <span>Phát Thanh Loa</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </button>
+
+                <!-- 9. Bảo Trì Thiết Bị -->
+                <button onclick="switchTab('tab-bao-tri'); toggleMobileSidebar(false);" id="mob-nav-bao-tri" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full cursor-pointer">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <i data-lucide="wrench" class="w-4 h-4 text-amber-500"></i>
+                        <span>Bảo Trì Thiết Bị</span>
                     </div>
                     <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
                 </button>
             </div>
         </div>
-        
-        <!-- NHÓM 1: THIẾT BỊ -->
+
+        <!-- NHÓM 2: TƯ LIỆU DỰ ÁN & LIÊN KẾT HỆ THỐNG -->
         <div>
-            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 pl-1">Thiết Bị</h4>
+            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 pl-1">
+                Tư Liệu & Liên Kết Hệ Thống
+            </h4>
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm flex flex-col divide-y divide-slate-100 dark:divide-slate-700/50">
+                <a href="album.html" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-purple-600 dark:text-purple-400">
+                        <i data-lucide="images" class="w-4 h-4"></i>
+                        <span>Album Kỷ Niệm Dự Án</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </a>
+                <a href="contact.html" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-blue-600 dark:text-blue-400">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                        <span>Liên Hệ & Hỗ Trợ Đề Tài</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </a>
+                <button id="mob-btn-admin-dashboard" onclick="openAdminModal(); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full cursor-pointer">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        <span>Quản Lý Người Dùng</span>
+                    </div>
+                    <span class="text-[9px] bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 font-black px-1.5 py-0.5 rounded">ADMIN</span>
+                </button>
+                <a href="https://console.firebase.google.com/project/hethongcongthongminh/database/hethongcongthongminh-default-rtdb/data" target="_blank" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-orange-600 dark:text-orange-400">
+                        <i data-lucide="database" class="w-4 h-4"></i>
+                        <span>Firebase Realtime DB</span>
+                    </div>
+                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
+                </a>
+                <a href="https://docs.google.com/spreadsheets/d/1VGSKa__Ge1KRXKrvok5pihtK_mnQeW302tZffFFk3HE/edit" target="_blank" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
+                    <div class="flex items-center gap-2.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                        <span>Nhật Ký Google Sheets</span>
+                    </div>
+                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- NHÓM 3: THIẾT BỊ -->
+        <div>
+            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 pl-1">Thiết Bị Cống</h4>
             <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
                 <div class="flex flex-col gap-1 p-3 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/50">
                     <div class="flex items-center justify-between">
@@ -1636,9 +1785,9 @@
             </div>
         </div>
 
-        <!-- NHÓM 2: NGUỒN (Realtime) -->
+        <!-- NHÓM 4: NGUỒN PIN & ĐIỆN ÁP -->
         <div>
-            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 pl-1">Nguồn Điện</h4>
+            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 pl-1">Nguồn Điện Trạm IoT</h4>
             <div class="grid grid-cols-1 gap-2">
                 <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-2.5 shadow-sm flex items-center justify-between">
                     <span class="text-[11px] font-bold text-slate-500 flex items-center gap-1.5"><i data-lucide="battery-charging" class="w-4 h-4 text-emerald-500"></i> Trạm Cống</span>
@@ -1657,9 +1806,9 @@
             </div>
         </div>
 
-        <!-- NHÓM 3: THỐNG KÊ -->
+        <!-- NHÓM 5: THỐNG KÊ PHIÊN WEB -->
         <div>
-            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 pl-1">Thống Kê</h4>
+            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 pl-1">Thống Kê Phiên</h4>
             <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm divide-y divide-slate-100 dark:divide-slate-700/50">
                 <div class="flex items-center justify-between p-3">
                     <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Thời gian phiên Web</span>
@@ -1670,96 +1819,24 @@
                     <span id="mob-maintenance" class="text-xs font-mono font-black text-amber-600 dark:text-amber-400">00:00:00</span>
                 </div>
                 <div class="flex items-center justify-between p-3">
-                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Phiên bản</span>
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-400">Phiên bản SCADA</span>
                     <span class="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">v2.1.0</span>
                 </div>
             </div>
         </div>
 
-        <!-- NHÓM 4: CÔNG CỤ -->
-        <div>
-            <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 pl-1">Công Cụ & Chức Năng</h4>
-            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm flex flex-col divide-y divide-slate-100 dark:divide-slate-700/50">
-                <button onclick="switchTab('tab-phat-thanh'); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
-                    <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                        <i data-lucide="volume-2" class="w-4 h-4 text-indigo-500"></i> Phát Thanh Loa
-                    </div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
-                <button onclick="switchTab('tab-canh-bao'); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
-                    <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                        <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500"></i> Cảnh Báo
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span id="mob-alert-log-count-sidebar" class="hidden px-1.5 py-0.5 text-[9px] bg-red-500 text-white font-black rounded-full">0</span>
-                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                    </div>
-                </button>
-                <button onclick="switchTab('tab-thao-tac'); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
-                    <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                        <i data-lucide="history" class="w-4 h-4 text-blue-500"></i> Lịch Sử Thao Tác
-                    </div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
-                <button onclick="switchTab('tab-bao-tri'); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
-                      <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                          <i data-lucide="wrench" class="w-4 h-4 text-amber-500"></i> Bảo Trì Thiết Bị
-                      </div>
-                      <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                  </button>
-                  
-                <!-- QUẢN LÝ NGƯỜI DÙNG (DÀNH CHO ADMIN) -->
-                <button id="mob-btn-admin-dashboard" onclick="openAdminModal(); toggleMobileSidebar(false);" class="hidden flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full border-t border-slate-100 dark:border-slate-700/50">
-                    <div class="flex items-center gap-2.5 text-xs font-bold text-indigo-600 dark:text-indigo-400">
-                        <i data-lucide="users" class="w-4 h-4"></i> Quản Lý Người Dùng
-                    </div>
-                    <span class="text-[9px] bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 font-black px-1.5 py-0.5 rounded">ADMIN</span>
-                </button>
-                <button onclick="switchTab('tab-settings'); toggleMobileSidebar(false);" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
-                    <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                        <i data-lucide="settings-2" class="w-4 h-4 text-slate-500"></i> Cài Đặt Hệ Thống
-                    </div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </button>
-
-                <a href="https://console.firebase.google.com/project/hethongcongthongminh/database/hethongcongthongminh-default-rtdb/data" target="_blank" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
-                    <div class="flex items-center gap-2.5 text-xs font-bold text-orange-600 dark:text-orange-400">
-                        <i data-lucide="database" class="w-4 h-4"></i> Firebase Database
-                    </div>
-                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
-                </a>
-                <a href="https://docs.google.com/spreadsheets/d/1VGSKa__Ge1KRXKrvok5pihtK_mnQeW302tZffFFk3HE/edit" target="_blank" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
-                    <div class="flex items-center gap-2.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Google Sheets
-                    </div>
-                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-400"></i>
-                </a>
-                <a href="album.html" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full border-t border-slate-100 dark:border-slate-700/50">
-                    <div class="flex items-center gap-2.5 text-xs font-bold text-purple-600 dark:text-purple-400">
-                        <i data-lucide="images" class="w-4 h-4"></i> Album Kỷ Niệm Dự Án
-                    </div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </a>
-                <a href="contact.html" class="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors w-full">
-                    <div class="flex items-center gap-2.5 text-xs font-bold text-blue-600 dark:text-blue-400">
-                        <i data-lucide="mail" class="w-4 h-4"></i> Thông Tin Liên Hệ & Hỗ Trợ
-                    </div>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                </a>
-            </div>
-        </div>
         <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 text-[10px] text-slate-400 dark:text-slate-500 text-center leading-relaxed font-medium">
             <p class="font-black text-[11px] text-slate-500 dark:text-slate-400 mb-1">HỆ THỐNG CỐNG THÔNG MINH</p>
             <p>Tác giả: Lê Trọng Nam, Trần Duy Khang, Huỳnh Minh Ngọc</p>
             <p>GVHD: Trần Thị Hồng Hạnh</p>
         </div>
     </div>
+
     <!-- Bottom Footer: Tài Khoản -->
     <div class="p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex-shrink-0">
         <h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 pl-1">Tài Khoản</h4>
         <div class="flex flex-col gap-2.5">
-            
-            <button id="mob-account-admin-btn" onclick="openAdminModal(); toggleMobileSidebar(false);" class="hidden w-full p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50 dark:bg-indigo-900/20 text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 transition-colors flex items-center justify-between">
+            <button id="mob-account-admin-btn" onclick="openAdminModal(); toggleMobileSidebar(false);" class="w-full p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50 dark:bg-indigo-900/20 text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 transition-colors flex items-center justify-between cursor-pointer">
                 <div class="flex items-center gap-2">
                     <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
                         <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
@@ -1768,19 +1845,18 @@
                 </div>
                 <span class="text-[9px] bg-indigo-600 text-white font-black px-1.5 py-0.5 rounded">ADMIN</span>
             </button>
-            <button onclick="openProfileModal(); toggleMobileSidebar(false);" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 transition-colors flex items-center gap-2">
+            <button onclick="openProfileModal(); toggleMobileSidebar(false);" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 transition-colors flex items-center gap-2 cursor-pointer">
                 <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                     <i data-lucide="user" class="w-3.5 h-3.5"></i>
                 </div>
                 Hồ Sơ Của Tôi
             </button>
-            <button onclick="logout(); toggleMobileSidebar(false);" class="w-full p-2.5 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 text-xs font-black text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <button onclick="logout(); toggleMobileSidebar(false);" class="w-full p-2.5 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 text-xs font-black text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer">
                 <i data-lucide="log-out" class="w-4 h-4"></i> ĐĂNG XUẤT HỆ THỐNG
-              </button>
-          </div>
-          
-      </div>
-  </aside>
+            </button>
+        </div>
+    </div>
+</aside>
 
 <!-- ================= 1B. HEADER SCADA DESKTOP (BẢO TOÀN GIỮ NGUYÊN TRÊN MÁY TÍNH md:block hidden) ================= -->
 <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40 shadow-sm hidden md:block">
@@ -1971,15 +2047,6 @@
 <script>
     let toolsMenuTimeout = null;
     function toggleToolsMenu() {
-        // Chan user khong cho truy cap menu Cong Cu
-        if (typeof window.isScadaAdmin !== 'undefined' && !window.isScadaAdmin) {
-            if (window.showToast) {
-                window.showToast("Bạn không có quyền truy cập Công Cụ! Chỉ Quản trị viên mới được phép.", "error");
-            } else {
-                alert("Bạn không có quyền truy cập Công Cụ! Chỉ Quản trị viên mới được phép.");
-            }
-            return;
-        }
         const menu = document.getElementById('tools-menu');
         const overlay = document.getElementById('tools-menu-overlay');
         const btn = document.getElementById('nav-tools');
@@ -4193,17 +4260,6 @@
     };
 
     function switchTab(tabId) {
-        // Chan user khong cho phep truy cap tab khac ngoai tab monitor, forecast va control
-        if (typeof window.isScadaAdmin !== 'undefined' && !window.isScadaAdmin) {
-            if (tabId !== 'tab-monitor' && tabId !== 'tab-forecast' && tabId !== 'tab-control') {
-                if (window.showToast) {
-                    window.showToast("Bạn không có quyền truy cập mục này! Chỉ Quản trị viên mới được phép.", "error");
-                } else {
-                    alert("Bạn không có quyền truy cập mục này! Chỉ Quản trị viên mới được phép.");
-                }
-                return;
-            }
-        }
         const toolsMenu = document.getElementById('tools-menu');
         if (toolsMenu && !toolsMenu.classList.contains('hidden') && typeof toggleToolsMenu === 'function') {
             toggleToolsMenu();
@@ -4227,10 +4283,16 @@
             el.classList.add('text-slate-400', 'border-transparent');
         });
 
+        // Reset Mobile Quick Tab Strip styles
+        document.querySelectorAll('#mobile-tab-strip button[id^="mob-strip-"]').forEach(el => {
+            el.classList.remove('bg-blue-50', 'dark:bg-blue-900/40', 'text-blue-600', 'dark:text-blue-300', 'border-blue-200', 'dark:border-blue-800', 'font-black');
+            el.classList.add('text-slate-600', 'dark:text-slate-400', 'bg-slate-100', 'dark:bg-slate-700/60', 'font-bold');
+        });
+
         // Reset Mobile Sidebar Tab styles
         document.querySelectorAll('aside button[id^="mob-nav-"]').forEach(el => {
-            el.classList.remove('bg-blue-50', 'dark:bg-blue-900/40', 'text-blue-600', 'dark:text-blue-300');
-            el.classList.add('text-slate-600', 'dark:text-slate-300');
+            el.classList.remove('bg-blue-50', 'dark:bg-blue-900/40', 'text-blue-600', 'dark:text-blue-300', 'font-black');
+            el.classList.add('text-slate-600', 'dark:text-slate-300', 'font-bold');
         });
         
         // Hiển thị Tab được chọn với hiệu ứng Fade-in mượt mà
@@ -4244,17 +4306,37 @@
         }, 20);
 
         const navSuffix = tabId.replace('tab-', '');
+        
+        // Cập nhật tab active trên Desktop
         const activeNav = document.getElementById('nav-' + navSuffix);
         if (activeNav) {
             activeNav.classList.remove('text-slate-400', 'border-transparent');
             activeNav.classList.add('text-blue-600', 'border-blue-600');
         }
 
+        // Cập nhật tab active trên Mobile Strip
+        const activeMobStrip = document.getElementById('mob-strip-' + navSuffix);
+        if (activeMobStrip) {
+            activeMobStrip.classList.remove('text-slate-600', 'dark:text-slate-400', 'bg-slate-100', 'dark:bg-slate-700/60', 'font-bold');
+            activeMobStrip.classList.add('bg-blue-50', 'dark:bg-blue-900/40', 'text-blue-600', 'dark:text-blue-300', 'border-blue-200', 'dark:border-blue-800', 'font-black');
+            try {
+                activeMobStrip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            } catch(e) {}
+        }
+
+        // Cập nhật tab active trên Mobile Sidebar Drawer
         const activeMobNav = document.getElementById('mob-nav-' + navSuffix);
         if (activeMobNav) {
-            activeMobNav.classList.remove('text-slate-600', 'dark:text-slate-300');
-            activeMobNav.classList.add('bg-blue-50', 'dark:bg-blue-900/40', 'text-blue-600', 'dark:text-blue-300');
+            activeMobNav.classList.remove('text-slate-600', 'dark:text-slate-300', 'font-bold');
+            activeMobNav.classList.add('bg-blue-50', 'dark:bg-blue-900/40', 'text-blue-600', 'dark:text-blue-300', 'font-black');
         }
+
+        // Cập nhật hash trên URL mà không reload trang
+        try {
+            if (history.replaceState) {
+                history.replaceState(null, null, '#' + tabId);
+            }
+        } catch(e) {}
 
         if (window.lucide) {
             window.lucide.createIcons();
@@ -4274,6 +4356,26 @@
             if (tbody) window.renderTableData('maint');
         }
     }
+
+    // Tự động chuyển tab theo URL Hash khi tải trang hoặc hashchange
+    window.addEventListener('DOMContentLoaded', () => {
+        const hash = (window.location.hash || '').replace(/^#\/?/, '').trim();
+        if (hash) {
+            const tabTarget = hash.startsWith('tab-') ? hash : 'tab-' + hash;
+            if (document.getElementById(tabTarget)) {
+                setTimeout(() => switchTab(tabTarget), 150);
+            }
+        }
+    });
+    window.addEventListener('hashchange', () => {
+        const hash = (window.location.hash || '').replace(/^#\/?/, '').trim();
+        if (hash) {
+            const tabTarget = hash.startsWith('tab-') ? hash : 'tab-' + hash;
+            if (document.getElementById(tabTarget)) {
+                switchTab(tabTarget);
+            }
+        }
+    });
 
     // Xử lý sự kiện kéo bằng chuột (Drag-to-scroll) & Safeguard DOM Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
